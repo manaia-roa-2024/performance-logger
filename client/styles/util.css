@@ -1,0 +1,90 @@
+.bold{
+  font-weight: 600;
+}
+
+.simple-center{
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.df{
+  display: flex;
+}
+
+.aic{
+  align-items: center;
+}
+
+.tac{
+  text-align: center;
+}
+
+.fs1{
+  align-items: flex-start;
+}
+
+.fs2{
+  align-self: flex-start;
+}
+
+.vert-flex{
+  display: flex;
+  flex-direction: column;
+}
+
+.g5{
+  gap: 5px;
+}
+
+.g10{
+  gap: 10px;
+}
+
+.g15{
+  gap: 15px;
+}
+
+.g20{
+  gap: 20px;
+}
+
+.g25{
+  gap: 25px;
+}
+
+.g30{
+  gap: 30px;
+}
+
+.g40{
+  gap: 40px;
+}
+
+.c-white{
+  color: white;
+}
+
+.c-black{
+  color: black;
+}
+
+.thin-scrollbar::-webkit-scrollbar{
+  width: 0.65vw;
+}
+
+.thin-scrollbar::-webkit-scrollbar-thumb{
+  background-color: #c2c2c2;
+  border-radius: 2vw;
+  border: 0.2vw solid rgba(0, 0, 0, 0);
+  background-clip: padding-box;
+}
+
+.thin-scrollbar::-webkit-scrollbar-thumb:hover{
+  cursor: pointer;
+  background-color: rgb(66, 66, 66);
+}
+
+.thin-scrollbar::-webkit-scrollbar-track{
+  background-color: transparent;
+}

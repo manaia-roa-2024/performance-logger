@@ -1,0 +1,101 @@
+/* Everything prefixed with sf (simpleform)*/
+:root{
+  --sf-eye-box-width: 30px;
+  --sf-currency-symbol-box-width: 20px;
+}
+
+.sf-container{ /* input containers that hold label, input, validation messeges */
+
+}
+
+.sf-input-box{
+  position: relative;
+}
+
+.sf-keyboard-input{ /* inputs that use keyboard input, text, number, password, email ect*/
+
+}
+
+.sf-text-input{ /* text input only */
+
+}
+
+.sf-text-area-input{ /* text area only */
+  
+}
+
+.sf-number-input{ /* number input only */
+
+}
+
+.sf-integer-input{ /* integer input only */
+
+}
+
+.sf-currency-input{ /* currency input only */
+  display: block;
+  box-sizing: border-box;
+  padding-left: var(--sf-currency-symbol-box-width);
+}
+
+.sf-currency-symbol-box{
+  height: 100%;
+  width: var(--sf-currency-symbol-box-width);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: absolute;
+
+  bottom: 0;
+  left: 0;
+  background-color: rgba(255, 192, 203, 0);
+}
+
+.sf-password-input{ /* password input only */
+  display: block;
+  box-sizing: border-box;
+}
+
+.sf-password-input.sf-eye-visible{
+  padding-right: var(--sf-eye-box-width);
+}
+
+.sf-eye-box{ /* container for eye icon*/
+  display: none;
+  align-items: center;
+  justify-content: center;
+  width: var(--sf-eye-box-width);
+  height: 100%;
+  background-color: rgba(255, 192, 203, 0);
+  position: absolute;
+
+  bottom: 0;
+  right: 0;
+  cursor: pointer;
+}
+
+.sf-eye-box > svg{
+  width: calc(var(--sf-eye-box-width) / 2);
+}
+
+.sf-eye-box.sf-eye-visible{
+  display: flex;
+}
+
+.sf-email-input{ /* email input only */
+
+}
+
+.sf-checkbox-input{
+  border: 1px solid #949494;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 18px;
+  height: 18px;
+  background-color: #fff;
+}
+
+.sf-check{
+  
+}

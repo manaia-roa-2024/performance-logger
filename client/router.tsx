@@ -7,7 +7,9 @@ import {
 import App from './components/App'
 
 const router = createBrowserRouter(
-  createRoutesFromElements([<Route path="/" element={<App />} />])
+  createRoutesFromElements([
+  <Route path="/" element={<App />} />
+])
 )
 
 export default router

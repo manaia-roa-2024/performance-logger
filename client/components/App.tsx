@@ -1,16 +1,25 @@
-import { useFruits } from '../hooks/useFruits.ts'
+import '../styles/main.css'
+import '../styles/defaults.css'
+import '../styles/util.css'
+import '../styles/root.css'
+import Footer from './Footer.tsx'
+import Header from './Header.tsx'
+import Main from './Main.tsx'
+import { SimpleFormProvider } from './SimpleForm/Form/SimpleFormProvider.tsx'
+import React from 'react'
 
-function App() {
-  const { data } = useFruits()
+class App extends React.Component{
 
-  return (
-    <>
-      <div className="app">
-        <h1>Fullstack Boilerplate - with Fruits!</h1>
-        <ul>{data && data.map((fruit) => <li key={fruit}>{fruit}</li>)}</ul>
-      </div>
-    </>
-  )
+  render(){
+    return (
+      <SimpleFormProvider>
+        <Header/>
+        <Main/>
+        <Footer/>
+      </SimpleFormProvider>
+    )
+  }
+  
 }
 
 export default App

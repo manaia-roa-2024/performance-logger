@@ -1,0 +1,19 @@
+:root{
+  /*header*/
+  --header-height: 80px;
+  --header-bg: #8bd994;
+
+  /*main*/
+  --main-height: calc(100vh - var(--header-height) - var(--footer-height));
+  --main-bg: #eee;
+
+  /*footer*/
+  --footer-height: 60px;
+  --footer-bg: #535353;
+
+  /*main content*/
+  --content-bg: white;
+  --content-width: 65vw;
+  --content-children-width: 55vw;
+  --content-border: 2px solid #d6d6d6;
+}
