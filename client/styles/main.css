@@ -24,7 +24,7 @@ footer{
   width: var(--content-width);
   border-left: var(--content-border);
   border-right: var(--content-border);
-
+  padding-top: 50px;
   margin: auto;
 }
 
@@ -33,5 +33,36 @@ footer{
 }
 
 .mc-header{
-  padding: 50px 0;
+
+}
+
+.separator {
+  border-bottom: 2px solid #d4d4d4;
+}
+
+.green-button{
+  background-color: #bef1c4;
+  padding: 10px;
+  border: 1px solid rgb(167, 167, 167);
+  border-radius: 5px;
+  font-size: 17px;
+}
+
+.green-button:hover {
+  background-color: #95eba0;
+}
+
+.green-button:active {
+  background-color: #6ce47c;
+}
+
+.log-group{
+  border-radius: 5px;
+  overflow: hidden;
+}
+
+.log-group-head{
+  padding: 15px;
+  background: var(--header-bg);
+  
 }

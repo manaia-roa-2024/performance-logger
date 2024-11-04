@@ -9,8 +9,8 @@ import { SimpleFormProvider } from './SimpleForm/Form/SimpleFormProvider.tsx'
 import React from 'react'
 
 class App extends React.Component{
-
   render(){
+
     return (
       <SimpleFormProvider>
         <Header/>

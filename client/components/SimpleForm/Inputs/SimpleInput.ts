@@ -25,7 +25,7 @@ const RANDOMIDFN = getRandomHtmlId
 export default class SimpleInput<T>{
   [key: string]: unknown
 
-  reload: () => void
+  #reload: (() => void) | undefined
 
   readonly id: string
   readonly type: string
@@ -54,7 +54,7 @@ export default class SimpleInput<T>{
     this.inputBoxClass = undefined
     this.dtoName = undefined
 
-    this.reload = () => {}
+    this.#reload = undefined
 
     this.id = id
     this.type = type
@@ -89,6 +89,20 @@ export default class SimpleInput<T>{
       readOnly: props.readonly,
       title: props.title
     }
+  }
+
+  reload(){
+    if (this.#reload){
+      this.#reload()
+    }
+  }
+
+  setReload(func: () => void){
+    this.#reload = func
+  }
+
+  hasReload(){
+    return this.#reload != undefined
   }
 
 }

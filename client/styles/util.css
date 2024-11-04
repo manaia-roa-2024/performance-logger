@@ -69,8 +69,16 @@
   color: black;
 }
 
+.black-border{
+  border: 1px solid black;
+}
+
 .thin-scrollbar::-webkit-scrollbar{
   width: 0.65vw;
+}
+
+.cp{
+  cursor: pointer;
 }
 
 .thin-scrollbar::-webkit-scrollbar-thumb{

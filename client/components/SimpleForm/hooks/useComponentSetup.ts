@@ -2,8 +2,10 @@ import { useContext } from "react";
 import InputProps from "../Inputs/InputProps";
 import SimpleInput from "../Inputs/SimpleInput";
 import { SimpleFormInstanceContext } from "../Form/SimpleFormInstance";
+import useReload from "./useReload";
 
 export default function<T extends SimpleInput<unknown>>(props: InputProps<T>){
+  const reload = useReload()
   const form = useContext(SimpleFormInstanceContext)!
   let input: T
 
@@ -15,6 +17,9 @@ export default function<T extends SimpleInput<unknown>>(props: InputProps<T>){
     input = props.input
 
     input = input as T
+
+    if (!input.hasReload())
+      input.setReload(reload)
 
     const finalProps: {[key: string]: unknown} = {input}
 
