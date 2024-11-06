@@ -146,7 +146,9 @@ footer{
 }
 
 .entry-date{
-  width: calc( (var(--record-sheet-width) - 2*var(--record-head-padding)) / 2 - var(--record-entry-gap) / 2);
+  /*width: calc( (var(--record-sheet-width) - 2*var(--record-head-padding)) / 2 - var(--record-entry-gap) / 2);*/
+  flex-grow: 1;
+  width: 0;
 }
 
 .entry-value{
@@ -171,4 +173,16 @@ footer{
 .value-plus-box{
   width: calc( (var(--record-sheet-width) - 2*var(--record-head-padding)) / 2 - var(--record-entry-gap) / 2);
   gap: var(--record-entry-gap)
+}
+
+.date-caret-box{
+  width: calc( (var(--record-sheet-width) - 2*var(--record-head-padding)) / 2 - var(--record-entry-gap) / 2);
+}
+
+.caret-box{
+  color: #6ec077;
+}
+
+.caret-box:hover{
+  color: rgb(245, 107, 15);
 }

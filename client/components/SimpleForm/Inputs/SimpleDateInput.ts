@@ -15,7 +15,7 @@ export default class SimpleDateInput extends SimpleInput<string>{
     this.max = undefined
     this.step = undefined
 
-    this.value = this.toISODate(this.getLocalDate())
+    this.value = this.toISODate(new Date())
   }
 
   spreadInput(props: InputProps<SimpleDateInput>): { [key: string]: unknown; } {
@@ -39,5 +39,10 @@ export default class SimpleDateInput extends SimpleInput<string>{
 
   getFullInputClass(props: InputProps<SimpleDateInput>){
     return cls('sf-date-input', props.inputClass)
+  }
+
+  asDate(): Date{
+
+    return new Date(this.value!)
   }
 }

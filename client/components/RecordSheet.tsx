@@ -11,6 +11,8 @@ import SimpleDateInput from './SimpleForm/Inputs/SimpleDateInput'
 import CDateInput from './SimpleForm/Components/CDateInput'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faPlus } from '@fortawesome/free-solid-svg-icons'
+import { faCaretLeft } from '@fortawesome/free-solid-svg-icons'
+import { faCaretRight } from '@fortawesome/free-solid-svg-icons'
 
 
 interface Props{
@@ -60,12 +62,29 @@ export default class RecordSheet extends Component<Props>{
 }
 
 class InnerSheet extends Component<Props>{
+  static contextType = SimpleFormInstanceContext
+
+  context!: React.ContextType<typeof SimpleFormInstanceContext>
+
+  incrementEntryDate(incrementer: number){
+    if (!this.context) return
+    const dateInput = this.context.form.getInput('date-entry') as SimpleDateInput
+    const asDate = dateInput.asDate()
+    asDate.setDate(asDate.getDate() + incrementer)
+    //console.log(dateInput.toISODate(asDate))
+    dateInput.updateValue(dateInput.toISODate(asDate))
+  }
+
   render(): ReactNode {
     return <div className='record-sheet'>
       <VertBox className='record-head' gap='5px'>
         <h5 className='tac' style={{fontSize: '16px'}}>Data Entry</h5>
         <Box className='aic entry-row'>
-          <CDateInput input='date-entry'/>
+          <Box className='date-caret-box'>
+            <Caret left={true} title='Decrease date' onClick={() => this.incrementEntryDate(-1)}/>
+            <CDateInput input='date-entry'/>
+            <Caret left={false} title='Increase date' onClick={() => this.incrementEntryDate(1)}/>
+          </Box>
           <Box className='value-plus-box'>
             <CTextInput input='value-entry'/>
             <div className='simple-center data-entry-plus'>
@@ -88,3 +107,12 @@ class InnerSheet extends Component<Props>{
     </div>
   }
 }
+
+class Caret extends Component<{left: boolean, title?: string, onClick: React.MouseEventHandler<HTMLDivElement>}>{
+  render(){
+    return <div className='simple-center caret-box cp' title={this.props.title} onClick={this.props.onClick}>
+      <FontAwesomeIcon fontSize={'25px'} icon={this.props.left ? faCaretLeft : faCaretRight}/>
+    </div>
+  }
+}
+
