@@ -7,7 +7,7 @@ import InputContainer from "./InputContainer";
 export default function CTextInput(props: InputProps<SimpleTextInput>){
 
   const {input, finalProps} = useComponentSetup<SimpleTextInput>(props)
- 
+
   return (
     <InputContainer finalProps={finalProps}>
       <input type='text' {...input.spreadInput(finalProps)}/>

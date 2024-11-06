@@ -16,4 +16,20 @@
   --content-width: 65vw;
   --content-children-width: 55vw;
   --content-border: 2px solid #d6d6d6;
+
+  /*record sheet*/
+  --record-sheet-width: 310px;
+  --record-sheet-bg: #f3f3f3;
+  --record-sheet-border-color: #b3b3b3;
+  --record-sheet-border: 1px solid var(--record-sheet-border-color);
+  --record-sheet-font-size: 17px;
+
+  --record-head-padding: 10px;
+
+  --record-cell-height: 30px;
+  --record-cell-width: 50%;
+
+  --record-entry-height: 30px;
+  --record-entry-gap: 6px;
+  --record-entry-items: 3;
 }

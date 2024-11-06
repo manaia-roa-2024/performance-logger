@@ -1,11 +1,16 @@
-import { ReactNode } from 'react'
+import { createRef, ReactNode, RefObject } from 'react'
 import QueryComponent from './QueryComponent'
 import { UseQueryResult } from '@tanstack/react-query'
-import { VertBox } from './Box'
+import { Box, VertBox } from './Box'
 import React from 'react'
 import LogGroup from '../../models/classes/LogGroup'
 import LogCollection from '../../models/classes/LogCollection'
 import getLogCollection from '../apis/getLogCollection'
+import cls from './SimpleForm/cls'
+import {FontAwesomeIcon} from '@fortawesome/react-fontawesome'
+import { faExpand, faMinus } from '@fortawesome/free-solid-svg-icons'
+import RecordSheet from './RecordSheet'
+
 
 export default class LogGroups extends QueryComponent {
   constructor(props: object){
@@ -22,7 +27,8 @@ export default class LogGroups extends QueryComponent {
       return <p>An unexpected error has occurred :(</p>
 
     return <VertBox gap='40px'>
-      {data.logGroups.map(group =>{
+      {data.logGroups.map((group, index) =>{
+        if (index > 0) return
         return <CLogGroup key={group.id} logGroup={group}/>
       })}
     </VertBox>
@@ -35,16 +41,22 @@ interface Props{
 
 interface State{
   open: boolean
+  lowerHeight: string
 }
 
 class CLogGroup extends React.Component<Props, State>{
+
+  lowerRef: RefObject<HTMLDivElement>
 
   constructor(props: Props){
     super(props)
 
     this.state ={
-      open: true
+      open: true,
+      lowerHeight: '0'
     }
+
+    this.lowerRef = createRef()
   }
 
   headClick(){
@@ -57,12 +69,41 @@ class CLogGroup extends React.Component<Props, State>{
     })
   }
 
+  correctLowerHeight(){
+    const element = this.lowerRef.current
+    if (!element || !element.children[0]) return
+
+    const child = element.children[0]
+    const rect = child.getBoundingClientRect()
+
+    this.setState(prev =>{
+      return {...prev, lowerHeight: rect.height + 'px'}
+    })
+  }
+
+  componentDidMount(): void {
+    this.correctLowerHeight()
+  }
+
   render(){
-    console.log(this.state)
     return <VertBox className='log-group black-border c-white'>
-      <div className='log-group-head cp' onClick={() => this.headClick()}>
-        <h4>{this.props.logGroup.name}</h4>
+      <Box className='log-group-head cp aic' onClick={() => this.headClick()}>
+        <h4 className='fg1'>{this.props.logGroup.name}</h4>
+        {this.state.open ? <Minus/> : <Expand/>}
+      </Box>
+      <div ref={this.lowerRef} className={cls('log-lower', 'c-black', !this.state.open && 'closed')} style={{height: this.state.open ? this.state.lowerHeight : '0'}}>
+        <Box className='log-inner'>
+          <RecordSheet logRecords={this.props.logGroup.logRecords}/>
+        </Box>   
       </div>
     </VertBox>
   }
+}
+
+function Expand(){
+  return <FontAwesomeIcon icon={faExpand} fontSize='25px'/>
+}
+
+function Minus(){
+  return <FontAwesomeIcon icon={faMinus} fontSize='25px'/>
 }

@@ -5,11 +5,13 @@ import { ChangeEvent } from "react"
 export default class SimpleKeyboardInput extends SimpleInput<string>{
   maxlength: number | undefined
   placeholder: string | undefined
+  size: string | undefined
 
   constructor(id: string, type: string){
     super(id, type)
     this.maxlength = undefined
     this.placeholder = undefined
+    this.size = undefined
     this.value = ''
   }
 
@@ -18,6 +20,7 @@ export default class SimpleKeyboardInput extends SimpleInput<string>{
       ...super.spreadInput(props),
       maxLength: props.maxlength,
       placeholder: props.placeholder,
+      size: this.size,
       onChange: (e: ChangeEvent<HTMLInputElement>) => this.updateValue(e.target.value)
     }
   }

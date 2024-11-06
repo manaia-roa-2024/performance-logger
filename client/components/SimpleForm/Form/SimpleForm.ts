@@ -16,7 +16,7 @@ export default class SimpleForm<T extends object>{
   addInput(input: BaseInput){
     this.#inputs.set(input.id, input)
     input.setReload(this.reload)
-
+    input.form = this
   }
   
   addInputs(...inputs: BaseInput[]){

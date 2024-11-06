@@ -1,3 +1,4 @@
+import SimpleForm from "../Form/SimpleForm"
 import getRandomHtmlId from "../GetRandomString"
 import '../simpleform.css'
 import InputProps from "./InputProps"
@@ -33,8 +34,13 @@ export default class SimpleInput<T>{
   required: boolean
 
   value: T | undefined
+
   containerClass: string | undefined
   inputBoxClass: string | undefined
+
+  useContainer: boolean
+  useInputBox: boolean
+
   inputClass: string | undefined
   label: string | undefined
   dtoName: string | undefined
@@ -42,6 +48,7 @@ export default class SimpleInput<T>{
   name: string | undefined
   readonly: boolean
   title: string | undefined
+  form: SimpleForm<object> | undefined
 
   constructor(id: string, type: string){
     this.inputClassBase = ''
@@ -53,6 +60,7 @@ export default class SimpleInput<T>{
     this.title = undefined
     this.inputBoxClass = undefined
     this.dtoName = undefined
+    this.form = undefined
 
     this.#reload = undefined
 
@@ -61,6 +69,8 @@ export default class SimpleInput<T>{
     this.elementId = RANDOMIDFN()
     this.required = false
     this.readonly = false
+    this.useContainer = true
+    this.useInputBox = true
   }
 
   updateValue(newValue: T){

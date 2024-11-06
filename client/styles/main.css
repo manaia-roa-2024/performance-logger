@@ -64,5 +64,111 @@ footer{
 .log-group-head{
   padding: 15px;
   background: var(--header-bg);
+}
+
+.log-group-head:hover{
+  color: rgb(241, 243, 137);
+}
+
+.log-lower{
+  background-color: #fff;
+  transition: height 0.2s;
+}
+
+.log-lower.closed{
+}
+
+.log-inner{
+  min-height: 300px;
+}
+
+.record-sheet{
+  border-right: var(--record-sheet-border);
+  width: var(--record-sheet-width);
+  background-color: var(--record-sheet-bg);
+}
+
+.record-head{
+  border-bottom: 2px solid var(--record-sheet-border-color);/*var(--record-sheet-border);*/
+  min-height: 60px;
+  padding: var(--record-head-padding);
+}
+
+.entry-row{
+  gap: var(--record-entry-gap)
+}
+
+.record-row{
+}
+
+.record-cell{
+  border-right: var(--record-sheet-border);
+  border-bottom: var(--record-sheet-border);
+  font-size: var(--record-sheet-font-size);
+
+  height: var(--record-cell-height);
+  width: var(--record-cell-width)
+}
+
+.record-cell:first-child{
+  padding: 0 10px;
+}
+
+.record-cell:last-child{
+  border-right: 0;
+}
+
+.cell-input{
+  outline: none;
+  background-color: transparent;
+  border: 0;
+  width: 100%;
+  padding: 0 10px;
+  height: 100%;
+  font-size: var(--record-sheet-font-size);
+}
+
+
+.date-entry{
+  outline: none;
+}
+
+
+.entry-input{
+  font-size: 15px;
+  height: var(--record-entry-height);
+  border: var(--record-sheet-border);
+  border-radius: 3px;
+  padding: 0 5px;
+  outline: none;
+
+  /*width: calc( (var(--record-sheet-width) - 2*var(--record-head-padding) - var(--record-cell-height) - var(--record-entry-items)*var(--record-entry-gap)) / 2);*/
+}
+
+.entry-date{
+  width: calc( (var(--record-sheet-width) - 2*var(--record-head-padding)) / 2 - var(--record-entry-gap) / 2);
+}
+
+.entry-value{
+  flex-grow: 1;
+  width: 100%;
+  /*width: calc( (var(--record-sheet-width) - 2*var(--record-head-padding)) / 2 - var(--record-entry-gap) / 2);*/
+}
+
+.data-entry-plus{
+  min-width: var(--record-entry-height);
+  width: var(--record-entry-height);
+  min-height: var(--record-entry-height);
+  height: var(--record-entry-height);
+
+  background: linear-gradient(180deg, #6ce47c, #28c23d);
+  border-radius: 2px;
+  cursor: pointer;
+  border: var(--record-sheet-border);
   
+}
+
+.value-plus-box{
+  width: calc( (var(--record-sheet-width) - 2*var(--record-head-padding)) / 2 - var(--record-entry-gap) / 2);
+  gap: var(--record-entry-gap)
 }
