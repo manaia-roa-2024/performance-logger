@@ -25,6 +25,7 @@ footer{
   border-left: var(--content-border);
   border-right: var(--content-border);
   padding-top: 50px;
+  padding-bottom: 50px;
   margin: auto;
 }
 
@@ -79,7 +80,6 @@ footer{
 }
 
 .log-inner{
-  min-height: 300px;
 }
 
 .record-sheet{
@@ -92,6 +92,12 @@ footer{
   border-bottom: 2px solid var(--record-sheet-border-color);/*var(--record-sheet-border);*/
   min-height: 60px;
   padding: var(--record-head-padding);
+}
+
+.record-lower{
+  min-height: 150px;
+  max-height: 80vh;
+  overflow-y: auto;
 }
 
 .entry-row{
@@ -164,10 +170,17 @@ footer{
   height: var(--record-entry-height);
 
   background: linear-gradient(180deg, #6ce47c, #28c23d);
-  border-radius: 2px;
+  border-radius: 4px;
   cursor: pointer;
   border: var(--record-sheet-border);
-  
+}
+
+.data-entry-plus:hover{
+  background: linear-gradient(180deg, rgb(250, 144, 74), rgb(190, 86, 17));
+}
+
+.data-entry-plus:active{
+  background: linear-gradient(180deg, rgb(231, 121, 47), rgb(148, 66, 11));
 }
 
 .value-plus-box{

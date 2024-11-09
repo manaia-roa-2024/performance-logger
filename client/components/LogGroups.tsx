@@ -10,6 +10,7 @@ import cls from './SimpleForm/cls'
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome'
 import { faExpand, faMinus } from '@fortawesome/free-solid-svg-icons'
 import RecordSheet from './RecordSheet'
+import LogRecord from '../../models/classes/LogRecord'
 
 
 export default class LogGroups extends QueryComponent {
@@ -44,6 +45,14 @@ interface State{
   lowerHeight: string
 }
 
+export interface ILogGroupContext{
+  correctHeightFn: () => void,
+  reload: () => void,
+  logRecords: LogRecord[]
+}
+
+export const LogGroupContext = React.createContext<ILogGroupContext | undefined>(undefined)
+
 class CLogGroup extends React.Component<Props, State>{
 
   lowerRef: RefObject<HTMLDivElement>
@@ -75,28 +84,31 @@ class CLogGroup extends React.Component<Props, State>{
 
     const child = element.children[0]
     const rect = child.getBoundingClientRect()
-
+    console.log('Correcting height')
     this.setState(prev =>{
       return {...prev, lowerHeight: rect.height + 'px'}
     })
   }
 
   componentDidMount(): void {
-    this.correctLowerHeight()
+    //this.correctLowerHeight()
   }
 
   render(){
-    return <VertBox className='log-group black-border c-white'>
-      <Box className='log-group-head cp aic' onClick={() => this.headClick()}>
-        <h4 className='fg1'>{this.props.logGroup.name}</h4>
-        {this.state.open ? <Minus/> : <Expand/>}
-      </Box>
-      <div ref={this.lowerRef} className={cls('log-lower', 'c-black', !this.state.open && 'closed')} style={{height: this.state.open ? this.state.lowerHeight : '0'}}>
-        <Box className='log-inner'>
-          <RecordSheet logRecords={this.props.logGroup.logRecords}/>
-        </Box>   
-      </div>
-    </VertBox>
+    return(
+    <LogGroupContext.Provider value={{correctHeightFn: () => this.correctLowerHeight(), reload: () => this.forceUpdate(), logRecords: this.props.logGroup.logRecords}}>
+      <VertBox className='log-group black-border c-white'>
+        <Box className='log-group-head cp aic' onClick={() => this.headClick()}>
+          <h4 className='fg1'>{this.props.logGroup.name}</h4>
+          {this.state.open ? <Minus/> : <Expand/>}
+        </Box>
+        <div ref={this.lowerRef} className={cls('log-lower', 'c-black', !this.state.open && 'closed')} style={{height: this.state.open ? undefined : '0'}}>
+          <Box className='log-inner'>
+            <RecordSheet logRecords={this.props.logGroup.logRecords}/>
+          </Box>   
+        </div>
+      </VertBox>
+    </LogGroupContext.Provider>)
   }
 }
 

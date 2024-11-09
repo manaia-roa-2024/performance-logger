@@ -15,7 +15,7 @@ export default class SimpleDateInput extends SimpleInput<string>{
     this.max = undefined
     this.step = undefined
 
-    this.value = this.toISODate(new Date())
+    this.value = SimpleDateInput.toISODate(SimpleDateInput.getLocalDate(new Date()))
   }
 
   spreadInput(props: InputProps<SimpleDateInput>): { [key: string]: unknown; } {
@@ -28,11 +28,11 @@ export default class SimpleDateInput extends SimpleInput<string>{
     }
   }
 
-  toISODate(date: Date): string{
-    return this.getLocalDate(date).toISOString().substring(0, 10)
+  static toISODate(date: Date): string{
+    return date.toISOString().substring(0, 10)
   }
 
-  getLocalDate = (date?: Date) =>{
+  static getLocalDate = (date?: Date) =>{
     const utc = date == null ? new Date() : date
     return new Date(utc.getTime() - (utc.getTimezoneOffset() * 60000))
   }
