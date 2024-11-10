@@ -1,16 +1,31 @@
 import Fields from "../Fields";
 import LogGroup from "./LogGroup";
 
-export default class LogRecord{
+//nullable means db determined
+export interface ILogRecord{
   id?: number
-  logGroup?: LogGroup
+  value: number,
+  date: string,
+  created?: string 
+}
+
+export default class LogRecord implements ILogRecord{
+  //db
+  id?: number
   value: number
   date: string
+  created?: string
+
+  //entities
+  logGroup?: LogGroup
 
   constructor(){
-    this.logGroup = undefined
+    this.id = undefined 
     this.value = 0
     this.date = '2024-11-03'
+    this.created = undefined
+
+    this.logGroup = undefined
   }
 
   static Instance(json: Fields<LogRecord>, logGroup: LogGroup){
