@@ -82,8 +82,18 @@ export const MetricHandler = (function(){
 
     return converterFn(baseValue)
   }
+
+  const hasMetric = function(metric: string){
+    return builder.metrics.has(metric)
+  }
+
+  const hasUnit = function(metric: string, unit: string){
+    return Boolean(builder.metrics.get(metric)?.units.get(unit))
+  }
   
   return {
-    convertTo
+    convertTo,
+    hasMetric,
+    hasUnit
   }
 })()

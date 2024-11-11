@@ -29,6 +29,13 @@ export default class ProblemDetails{
     return pd
   }
 
+  static PropertyMissingError(propName: string){
+    const pd = new ProblemDetails()
+    pd.message = propName + ' is required'
+    pd.errors[propName] = [pd.message]
+    return pd
+  }
+
   static UnknownError(){
     const pd = new ProblemDetails(500)
     pd.message = 'An unexpected error has occured'
