@@ -8,7 +8,7 @@ export async function getAllGroups(){
 }
 
 export async function getAllRecords(logGroupId: number){
-  const result = await connection<ILogRecord>('logRecords')
+  const result = await connection<ILogRecord>('logRecord')
     .where({logGroupId})
   return result
 }

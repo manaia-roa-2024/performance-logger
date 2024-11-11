@@ -1,6 +1,8 @@
+import request from "superagent";
 import LogCollection from "../../models/classes/LogCollection";
-import { testData } from "./testData";
 
 export default function getLogCollection(){
-  return LogCollection.Instance(testData)
+  return request.get('/api/v1/loggroups').then(res =>{
+      return LogCollection.Instance(res.body)
+  })
 } 

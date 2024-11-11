@@ -51,11 +51,15 @@ export default class RecordSheet extends Component<Props>{
   }
 
   render() {
-
     return (
-      <SimpleFormContainer id='record-sheet' formBuilder={this.formBuilder}>
-        <InnerSheet {...this.props}/>
-      </SimpleFormContainer>  
+      <LogGroupContext.Consumer>
+        {(context: ILogGroupContext | undefined) =>{
+
+          return <SimpleFormContainer id={'record-sheet-' + context.logGroup.id} formBuilder={this.formBuilder}>
+            <InnerSheet {...this.props}/>
+          </SimpleFormContainer>     
+        }}
+      </LogGroupContext.Consumer>
     )
   }
 }
@@ -101,6 +105,8 @@ class InnerSheet extends Component<Props>{
           <Box className='value-plus-box'>
             <LogGroupContext.Consumer>
               {(context: ILogGroupContext | undefined) =>{
+                console.log(context)
+                console.log(this.context)
                 return (
                 <>
                   <CNumberInput input='value-entry'/>
@@ -140,9 +146,7 @@ class CLogRecord extends Component<{logRecord: LogRecord}>{
         lgContext.reload()
       }
     }
-
     return (
-    
     <LogGroupContext.Consumer>
       {(lgContext: ILogGroupContext | undefined) =>{
         return <Box className='record-row'>

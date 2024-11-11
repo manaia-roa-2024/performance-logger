@@ -1,8 +1,6 @@
-import Fields from "../Fields";
-import LogGroup from "./LogGroup";
+import LogGroup, { ILogGroup } from "./LogGroup";
 
 export default class LogCollection{
-  id?: number
   logGroups: LogGroup[]
 
   constructor(){
@@ -14,16 +12,12 @@ export default class LogCollection{
     logGroup.logCollection = this
   }
 
-  static Instance(json: Fields<LogCollection>){
-    const lc = new LogCollection()
-
-    lc.id = json.id
-
-    for (const logGroup of json.logGroups){
-      lc.logGroups.push(LogGroup.Instance(logGroup, lc))
+  static Instance(logGroups: Array<ILogGroup>){
+    const collection = new LogCollection()
+    for (const lg of logGroups){
+      collection.addLogGroup(LogGroup.Instance(lg, collection))
     }
-
-    return lc
+    return collection
   }
 }
 

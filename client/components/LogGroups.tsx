@@ -11,6 +11,7 @@ import {FontAwesomeIcon} from '@fortawesome/react-fontawesome'
 import { faExpand, faMinus } from '@fortawesome/free-solid-svg-icons'
 import RecordSheet from './RecordSheet'
 import LogRecord from '../../models/classes/LogRecord'
+import getLogRecords from '../apis/getLogRecords'
 
 
 export default class LogGroups extends QueryComponent {
@@ -19,17 +20,15 @@ export default class LogGroups extends QueryComponent {
   }
 
   renderQuery({ data, isPending, isError }: UseQueryResult<LogCollection>): ReactNode {
-    console.log(data)
-
     if (isPending)
       return <p>Pending...</p>
 
     if (isError || !data)
-      return <p>An unexpected error has occurred :(</p>
+      return <p>There was an error loading your records</p>
 
     return <VertBox gap='40px'>
       {data.logGroups.map((group, index) =>{
-        if (index > 0) return
+        if (index > 1) return 
         return <CLogGroup key={group.id} logGroup={group}/>
       })}
     </VertBox>
@@ -48,17 +47,18 @@ interface State{
 export interface ILogGroupContext{
   correctHeightFn: () => void,
   reload: () => void,
-  logRecords: LogRecord[]
+  logRecords: LogRecord[],
+  logGroup: LogGroup
 }
 
 export const LogGroupContext = React.createContext<ILogGroupContext | undefined>(undefined)
 
-class CLogGroup extends React.Component<Props, State>{
+class CLogGroup extends QueryComponent<Props, State>{
 
   lowerRef: RefObject<HTMLDivElement>
 
   constructor(props: Props){
-    super(props)
+    super(props, ['records', props.logGroup.id!.toString()], () => getLogRecords(props.logGroup))
 
     this.state ={
       open: true,
@@ -94,9 +94,16 @@ class CLogGroup extends React.Component<Props, State>{
     //this.correctLowerHeight()
   }
 
-  render(){
+  renderQuery({ data: logRecords, isPending, isError }: UseQueryResult<Array<LogRecord>>){
+
+    if (isPending)
+      return <p>Pending...</p>
+
+    if (isError || !logRecords)
+      return <p>There was an error loading your records</p>
+
     return(
-    <LogGroupContext.Provider value={{correctHeightFn: () => this.correctLowerHeight(), reload: () => this.forceUpdate(), logRecords: this.props.logGroup.logRecords}}>
+    <LogGroupContext.Provider value={{correctHeightFn: () => this.correctLowerHeight(), reload: () => this.forceUpdate(), logRecords: logRecords, logGroup: this.props.logGroup}}>
       <VertBox className='log-group black-border c-white'>
         <Box className='log-group-head cp aic' onClick={() => this.headClick()}>
           <h4 className='fg1'>{this.props.logGroup.name}</h4>
@@ -104,7 +111,7 @@ class CLogGroup extends React.Component<Props, State>{
         </Box>
         <div ref={this.lowerRef} className={cls('log-lower', 'c-black', !this.state.open && 'closed')} style={{height: this.state.open ? undefined : '0'}}>
           <Box className='log-inner'>
-            <RecordSheet logRecords={this.props.logGroup.logRecords}/>
+            <RecordSheet logRecords={logRecords}/>
           </Box>   
         </div>
       </VertBox>

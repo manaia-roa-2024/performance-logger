@@ -1,6 +1,5 @@
 import { QueryFunction, useQuery, UseQueryResult } from "@tanstack/react-query";
 import { Component, ReactNode } from "react";
-import LogCollection from "../../models/classes/LogCollection";
 
 interface QueryProps{
   queryKey: string[]
@@ -8,16 +7,16 @@ interface QueryProps{
 }
 
 function Query(props: QueryProps & {children: (result: UseQueryResult) => ReactNode}) {
-
-  return props.children(useQuery({queryKey: props.queryKey, queryFn: props.queryFn}));
+  const query = useQuery({queryKey: props.queryKey, queryFn: props.queryFn})
+  return props.children(query);
 }
 
-export default class QueryComponent extends Component{
+export default class QueryComponent<P=object, S=object, SS=object> extends Component<P, S, SS>{
 
   queryKey: string[]
   queryFn: QueryFunction
 
-  constructor(props: object, queryKey: string[], queryFn: QueryFunction){
+  constructor(props: P, queryKey: string[], queryFn: QueryFunction){
     super(props)
     this.queryKey = queryKey
     this.queryFn = queryFn
@@ -25,7 +24,7 @@ export default class QueryComponent extends Component{
 
   render() {
     return <Query queryKey={this.queryKey} queryFn={this.queryFn}>
-      {this.renderQuery}
+      {(queryResult: UseQueryResult) => this.renderQuery(queryResult)}
     </Query>
   }
 

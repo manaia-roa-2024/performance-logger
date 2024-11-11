@@ -1,4 +1,3 @@
-import Fields from "../Fields";
 import LogCollection from "./LogCollection";
 import LogRecord from "./LogRecord";
 
@@ -34,16 +33,12 @@ export default class LogGroup implements ILogGroup{
     this.logCollection = undefined
   }
 
-  static Instance(json: Fields<LogGroup>, logCollection: LogCollection){
+  static Instance(json: ILogGroup, logCollection: LogCollection){
     const lg = new LogGroup()
     
     lg.id = json.id
     lg.name = json.name
     lg.logCollection = logCollection
-
-    for (const record of json.logRecords){
-      lg.logRecords.push(LogRecord.Instance(record, lg))
-    }
 
     return lg
   }

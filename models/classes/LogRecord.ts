@@ -1,4 +1,3 @@
-import Fields from "../Fields";
 import LogGroup from "./LogGroup";
 
 //nullable means db determined
@@ -31,7 +30,7 @@ export default class LogRecord implements ILogRecord{
     this.logGroup = undefined
   }
 
-  static Instance(json: Fields<LogRecord>, logGroup: LogGroup){
+  static Instance(json: ILogRecord, logGroup: LogGroup){
     const lr = new LogRecord(logGroup.id!)
 
     lr.id = json.id

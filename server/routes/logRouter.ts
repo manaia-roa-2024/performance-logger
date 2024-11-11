@@ -5,8 +5,8 @@ import * as db from '../db/dbUtil.ts'
 const router = Router()
 
 router.get('/loggroups', async (req, res) =>{
-    const logGroups = await db.getAllGroups()
-    res.json(logGroups)
+  const logGroups = await db.getAllGroups()
+  res.json(logGroups)
 })
 
 router.get('/logrecords', async (req, res) =>{
