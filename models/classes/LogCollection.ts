@@ -23,6 +23,9 @@ export default class LogCollection{
   static Clone(oldCollection: LogCollection){
     const lc = new LogCollection()
     lc.logGroups = oldCollection.logGroups
+    for (const lg of oldCollection.logGroups){
+      lg.logCollection = lc
+    }
     return lc
   }
 }
