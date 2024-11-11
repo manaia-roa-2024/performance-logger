@@ -3,7 +3,6 @@ import * as Path from 'node:path'
 
 import logRouter from './routes/logRouter.ts'
 import errorHandler from './middleware/errorHandler.ts'
-import ProblemDetails from './ProblemDetails.ts'
 import BodyValidator from './middleware/BodyValidator.ts'
 
 const server = express()
@@ -12,7 +11,7 @@ server.use(express.json())
 
 server.use('/api/v1/', logRouter)
 
-server.post('/test', BodyValidator.LogRecord, (req, res) =>{
+server.post('/test', BodyValidator.LogRecord, async (req, res) =>{
   res.status(200)
   res.send("Yippy I O")
 })

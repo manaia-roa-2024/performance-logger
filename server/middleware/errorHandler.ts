@@ -1,7 +1,7 @@
 import { NextFunction, Request, Response } from "express";
 import ProblemDetails from "../ProblemDetails";
 
-export default function errorHandler(err: unknown, req: Request, res: Response, next: NextFunction){
+export default async function errorHandler(err: unknown, req: Request, res: Response, next: NextFunction){
   if (res.headersSent) {
     return next(err)
   }
