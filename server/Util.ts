@@ -4,4 +4,11 @@ const formatText = function(text: string){
 
 const validDateRgx = /^\d{4}-\d{2}-\d{2}$/
 
-export default {formatText, validDateRgx}
+function toISODate(date: Date){
+  return date.toISOString().substring(0, 10)
+}
+
+function createTimeStamp(){
+  return (new Date()).toISOString()
+}
+export default {formatText, validDateRgx, toISODate, createTimeStamp}

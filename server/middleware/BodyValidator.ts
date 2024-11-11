@@ -34,6 +34,9 @@ function cna(dto: Record<string, unknown>, ...propertyNames: Array<string>){ //c
 const LogGroup: RequestHandler = function(req, res, next){
   const dto = req.body as ToDict<ILogGroup>
 
+  if (!dto || typeof(dto) !== 'object')
+    throw ProblemDetails.UserError('Expected an object')
+
   cna(dto, 'name', 'metric', 'unit') // check that all the following properties are not null
 
   ct('name', dto.name, 'string')
@@ -54,6 +57,10 @@ const LogGroup: RequestHandler = function(req, res, next){
 
 const LogRecord: RequestHandler = function (req, res, next){
   const dto = req.body as ToDict<ILogRecord>
+  console.log(dto)
+
+  if (!dto || typeof(dto) !== 'object')
+    throw ProblemDetails.UserError('Expected an object')
 
   cna(dto, 'value', 'date', 'logGroupId')
 

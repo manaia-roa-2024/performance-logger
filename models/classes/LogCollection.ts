@@ -19,6 +19,12 @@ export default class LogCollection{
     }
     return collection
   }
+
+  static Clone(oldCollection: LogCollection){
+    const lc = new LogCollection()
+    lc.logGroups = oldCollection.logGroups
+    return lc
+  }
 }
 
 

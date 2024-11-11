@@ -45,7 +45,7 @@ const seedRecords = (function(){
       value: (8 + Math.random() * 30).toFixed(2),
       date: rd(new Date(lg.created)),
       created: rdt(new Date(lg.created)),
-      logGroupId: 1
+      logGroupId: 2
     })
   }
 
@@ -56,7 +56,7 @@ const seedRecords = (function(){
       value: 85 - (0.1 * i),
       date: rd(new Date(lg.created)),
       created: rdt(new Date(lg.created)),
-      logGroupId: 2
+      logGroupId: 3
     })
   }
 
@@ -67,7 +67,7 @@ const seedRecords = (function(){
       value: Math.round(140 + (0.25 * i)),
       date: rd(new Date(lg.created)),
       created: rdt(new Date(lg.created)),
-      logGroupId: 3
+      logGroupId: 4
     })
   }
 

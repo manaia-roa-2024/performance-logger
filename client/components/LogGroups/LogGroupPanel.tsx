@@ -23,7 +23,6 @@ export default class LogGroupPanel extends QueryComponent {
     return (
       <VertBox gap="40px">
         {data.logGroups.map((group, index) => {
-          if (index > 1) return
           return <CLogGroup key={group.id} logGroup={group} />
         })}
       </VertBox>

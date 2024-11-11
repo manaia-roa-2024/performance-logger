@@ -8,6 +8,12 @@ export default class ProblemDetails{
     this.errors = {}
   }
 
+  static UserError(msg: string){
+    const pd = new ProblemDetails()
+    pd.message = msg
+    return pd
+  }
+
   static PropertyError(propertyName: string, msg: string){
     const pd = new ProblemDetails()
     pd.message = 'There was a problem with one or more properties'
