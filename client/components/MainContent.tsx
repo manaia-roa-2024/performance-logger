@@ -1,38 +1,8 @@
-import { Children, Component, ReactNode } from 'react'
+import { Component } from 'react'
 import { VertBox } from './Box'
 import ContentChild from './ContentChild'
 import LogGroups from './LogGroups/LogGroupPanel'
-import { useMutation, UseMutationResult, useQueryClient } from '@tanstack/react-query'
-import LogGroup, { ILogGroup } from '../../models/classes/LogGroup'
-import addLogGroup from '../apis/addLogGroup'
-import LogCollection from '../../models/classes/LogCollection'
-
-interface MutationProps{
-  children: (mutationResult: UseMutationResult<any, Error, void, unknown>) => ReactNode
-}
-
-function MutationComponent(props: MutationProps){
-  const queryClient = useQueryClient()
-
-  const lg: ILogGroup = {
-    name: 'New Performance Group',
-    metric: 'length',
-    unit: 'M'
-  }
-
-  const mutation = useMutation<ILogGroup>({
-    mutationFn: () => addLogGroup(lg),
-    onSuccess(newLogGroup, variables, context) {
-      queryClient.setQueryData(['log-collection'], (old: LogCollection) =>{
-        const clone = LogCollection.Clone(old)
-        clone.logGroups.splice(0, 0, LogGroup.Instance(newLogGroup, clone))
-        return clone
-      })
-    },
-  })
-
-  return props.children(mutation)
-}
+import AddGroupButton from './AddGroupButton'
 
 export default class MainContent extends Component {
   render() {
@@ -48,11 +18,7 @@ export default class MainContent extends Component {
         <VertBox gap="40px">
           <ContentChild>
             <VertBox gap="15px">
-              <MutationComponent>
-                {({mutate}) =>{
-                  return <button onClick={() => mutate()} className="green-button fs2 cp">Add New Group</button>
-                }}
-              </MutationComponent>
+              <AddGroupButton/>
               <div className="separator"></div>
             </VertBox>
           </ContentChild>
