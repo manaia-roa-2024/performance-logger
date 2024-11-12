@@ -2,6 +2,8 @@ import SimpleInput from "../Inputs/SimpleInput"
 
 type BaseInput = SimpleInput<unknown>
 
+export type FormBuilder = (form: SimpleForm<Record<string, unknown>>) => void
+
 export default class SimpleForm<T extends object>{
   id: string
   #inputs: Map<string, BaseInput>

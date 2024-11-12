@@ -199,3 +199,17 @@ footer{
 .caret-box:hover{
   color: rgb(245, 107, 15);
 }
+
+.edit-pen{
+  opacity: 0;
+  border-radius: 50%;
+  padding: 6px;
+}
+
+.edit-pen:hover{
+  background-color: #505050;
+}
+
+.log-group-head:hover .edit-pen{
+  opacity: 1;
+}

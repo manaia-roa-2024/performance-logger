@@ -33,6 +33,10 @@ export default class LogGroup implements ILogGroup{
     this.logCollection = undefined
   }
 
+  formId(){
+    return 'record-sheet-' + this.id
+  }
+
   static Instance(json: ILogGroup, logCollection: LogCollection){
     const lg = new LogGroup()
     

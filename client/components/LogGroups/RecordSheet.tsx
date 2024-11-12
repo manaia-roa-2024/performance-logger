@@ -1,7 +1,7 @@
 import { Component, ReactNode } from 'react'
 import LogRecord from '../../../models/classes/LogRecord'
 import SimpleFormContainer from '../SimpleForm/Form/SimpleFormContainer'
-import SimpleForm from '../SimpleForm/Form/SimpleForm'
+import SimpleForm, { FormBuilder } from '../SimpleForm/Form/SimpleForm'
 import { SimpleFormInstanceContext } from '../SimpleForm/Form/SimpleFormInstance'
 import { Box, VertBox } from '../Box'
 import SimpleDateInput from '../SimpleForm/Inputs/SimpleDateInput'
@@ -21,46 +21,16 @@ interface Props {
 }
 
 export default class RecordSheet extends Component<Props> {
-  formBuilder: (form: SimpleForm<Record<string, unknown>>) => void
 
   constructor(props: Props) {
     super(props)
 
-    this.formBuilder = (form) => {
-      const dateEntry = new SimpleDateInput('date-entry')
-      dateEntry.inputClass = 'entry-input entry-date'
-      dateEntry.useInputBox = false
-      dateEntry.useContainer = false
-
-      const valueEntry = new SimpleNumberInput('value-entry')
-      valueEntry.inputClass = 'entry-input entry-value'
-      valueEntry.useInputBox = false
-      valueEntry.useContainer = false
-      valueEntry.placeholder = 'New Entry'
-
-      for (const logRecord of this.props.logRecords) {
-        form.addInput(CellInput(logRecord))
-      }
-
-      form.addInputs(dateEntry, valueEntry)
-    }
   }
 
   render() {
     return (
-      <LogGroupContext.Consumer>
-        {(context: ILogGroupContext | undefined) => {
-          return (
-            <SimpleFormContainer
-              id={'record-sheet-' + context!.logGroup.id}
-              formBuilder={this.formBuilder}
-            >
               <InnerSheet {...this.props} />
-            </SimpleFormContainer>
           )
-        }}
-      </LogGroupContext.Consumer>
-    )
   }
 }
 
