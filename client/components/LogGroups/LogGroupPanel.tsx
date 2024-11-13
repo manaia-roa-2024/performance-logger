@@ -5,6 +5,7 @@ import { VertBox } from '../Box'
 import LogCollection from '../../../models/classes/LogCollection'
 import getLogCollection from '../../apis/getLogCollection'
 import CLogGroup from './CLogGroup'
+import FormLogger from '../FormLogger'
 
 export default class LogGroupPanel extends QueryComponent {
   constructor(props: object) {
@@ -25,6 +26,7 @@ export default class LogGroupPanel extends QueryComponent {
         {data.logGroups.map((group, index) => {
           return <CLogGroup key={group.id} logGroup={group} />
         })}
+        <FormLogger/>
       </VertBox>
     )
   }

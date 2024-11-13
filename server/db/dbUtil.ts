@@ -43,3 +43,8 @@ export async function editGroup(group: Optional<ILogGroup>, id: number){
     throw ProblemDetails.NullError('group')
   return result[0]
 }
+
+export async function deleteGroup(id: number){
+  await connection('logGroup')
+    .where({id}).delete()
+}

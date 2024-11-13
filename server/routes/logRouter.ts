@@ -21,6 +21,11 @@ router.patch('/loggroups/:id', BodyValidator.EditLogGroup, async (req, res) =>{
   res.json(result)
 })
 
+router.delete('/loggroups/:id', async (req, res) =>{
+  await db.deleteGroup(Number(req.params.id))
+  res.sendStatus(200)
+})
+
 router.get('/logrecords', async (req, res) =>{
 
   const logResults = await db.getAllRecords(Number(req.query.groupId))
@@ -28,6 +33,7 @@ router.get('/logrecords', async (req, res) =>{
   res.json(logResults)
   
 })
+
 
 
 

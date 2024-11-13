@@ -234,3 +234,74 @@ footer{
   border: 2px solid transparent;
   padding: 5px 0;
 }
+
+.group-main{
+  padding: 10px 0;
+}
+
+.gm-content{
+  padding: 0 20px;
+}
+
+.trash-box:hover{
+  color: red;
+  cursor: pointer;
+}
+
+dialog.bp-popup{
+  padding: 0;
+  background-color: transparent;
+  border: 0;
+  border-radius: 5px;;
+}
+
+dialog:focus-visible{
+  outline: none;
+}
+
+
+
+.delete-popup {
+  background-color: white;
+  
+  width: 430px;
+}
+
+.prompt{
+  height: 130px;
+  padding: 0 20px;
+}
+
+.prompt-buttons{
+  height: 50px;
+}
+
+.prompt-buttons > .ynb{
+  border: 0;
+  cursor: pointer;
+  color: white;
+}
+
+.yes{
+  background-color: #ff5d5d;
+}
+
+.yes:hover{
+  background-color: #d34b4b;
+}
+
+.yes:active{
+  background-color: #b84242;
+}
+
+.no{
+  background-color: silver;
+}
+
+.no:hover{
+  background-color: #a8a7a7;
+}
+
+.no:active{
+  background-color: #8a8888;
+}

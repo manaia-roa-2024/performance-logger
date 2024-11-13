@@ -9,6 +9,7 @@ import LogRecord from '../../../models/classes/LogRecord'
 import getLogRecords from '../../apis/getLogRecords'
 import { LGProvider } from './LGContext'
 import LGHead from './LGHead'
+import GroupMain from './GroupMain/GroupMain'
 
 interface Props {
   logGroup: LogGroup
@@ -74,6 +75,7 @@ export default class CLogGroup extends QueryComponent<Props, State> {
             style={{ height: this.state.open ? undefined : '0' }}>
             <Box className="log-inner">
               <RecordSheet logRecords={logRecords} />
+              <GroupMain/>
             </Box>
           </div>
         </VertBox>

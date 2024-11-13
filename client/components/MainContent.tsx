@@ -1,7 +1,7 @@
 import { Component } from 'react'
 import { VertBox } from './Box'
 import ContentChild from './ContentChild'
-import LogGroups from './LogGroups/LogGroupPanel'
+import LogGroupPanel from './LogGroups/LogGroupPanel'
 import AddGroupButton from './AddGroupButton'
 
 export default class MainContent extends Component {
@@ -23,7 +23,7 @@ export default class MainContent extends Component {
             </VertBox>
           </ContentChild>
           <ContentChild>
-            <LogGroups />
+            <LogGroupPanel />
           </ContentChild>
         </VertBox>
       </VertBox>

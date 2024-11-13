@@ -1,4 +1,4 @@
-import React from "react"
+import React, { ContextType } from "react"
 import LogGroup from "../../../models/classes/LogGroup"
 import { ReactNode } from "react"
 import { FormBuilder } from "../SimpleForm/Form/SimpleForm"
@@ -7,6 +7,7 @@ import { SimpleNumberInput } from "../SimpleForm/Inputs/SimpleNumberInput"
 import CellInput from "../InputTemplates/CellInput"
 import SimpleFormContainer from "../SimpleForm/Form/SimpleFormContainer"
 import SimpleTextInput from "../SimpleForm/Inputs/SimpleTextInput"
+import { SimpleFormContext } from "../SimpleForm/Form/SimpleFormProvider"
 
 export interface ILogGroupContext {
   /*correctHeightFn: () => void*/
@@ -22,6 +23,10 @@ export const LogGroupContext = React.createContext<ILogGroupContext>({
 })
 
 export class LGProvider extends React.Component<Props>{
+  static contextType = SimpleFormContext
+
+  context!: ContextType<typeof SimpleFormContext>
+
   formBuilder: FormBuilder
   
   constructor(props: Props){
@@ -51,6 +56,10 @@ export class LGProvider extends React.Component<Props>{
 
       form.addInputs(nameInput, dateEntry, valueEntry)
     }
+  }
+
+  componentWillUnmount(): void {
+    this.context?.removeForm(this.props.logGroup.formId())
   }
 
   render(): ReactNode {
