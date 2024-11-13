@@ -5,6 +5,7 @@ type BaseInput = SimpleInput<unknown>
 export type FormBuilder = (form: SimpleForm<Record<string, unknown>>) => void
 
 export default class SimpleForm<T extends object>{
+  rand: number
   id: string
   #inputs: Map<string, BaseInput>
   reload: () => void
@@ -13,6 +14,7 @@ export default class SimpleForm<T extends object>{
     this.id = id
     this.#inputs = new Map<string, BaseInput>()
     this.reload = () => {}
+    this.rand = Math.random()
   }
 
   addInput(input: BaseInput){

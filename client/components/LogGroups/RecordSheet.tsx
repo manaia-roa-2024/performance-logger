@@ -10,9 +10,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faPlus } from '@fortawesome/free-solid-svg-icons'
 import { faCaretLeft } from '@fortawesome/free-solid-svg-icons'
 import { faCaretRight } from '@fortawesome/free-solid-svg-icons'
-import { SimpleNumberInput } from '../SimpleForm/Inputs/SimpleNumberInput'
 import CNumberInput from '../SimpleForm/Components/CNumberInput'
-import CellInput from '../InputTemplates/CellInput'
 import { ILogGroupContext, LogGroupContext } from './LGContext'
 import { CLogRecord } from './CLogRecord'
 
@@ -92,8 +90,6 @@ class InnerSheet extends Component<Props> {
             <Box className="value-plus-box">
               <LogGroupContext.Consumer>
                 {(context: ILogGroupContext | undefined) => {
-                  console.log(context)
-                  console.log(this.context)
                   return (
                     <>
                       <CNumberInput input="value-entry" />

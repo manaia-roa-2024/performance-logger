@@ -1,3 +1,4 @@
+import { FocusEventHandler, MouseEventHandler } from "react"
 import SimpleForm from "../Form/SimpleForm"
 import getRandomHtmlId from "../GetRandomString"
 import '../simpleform.css'
@@ -50,6 +51,9 @@ export default class SimpleInput<T>{
   title: string | undefined
   form: SimpleForm<object> | undefined
 
+  onClick: MouseEventHandler | undefined
+  onBlur: FocusEventHandler | undefined
+
   constructor(id: string, type: string){
     this.inputClassBase = ''
     this.inputClass = undefined
@@ -61,6 +65,8 @@ export default class SimpleInput<T>{
     this.inputBoxClass = undefined
     this.dtoName = undefined
     this.form = undefined
+    this.onClick = undefined
+    this.onBlur = undefined
 
     this.#reload = undefined
 
@@ -97,7 +103,9 @@ export default class SimpleInput<T>{
       value: props.value,
       name: props.name,
       readOnly: props.readonly,
-      title: props.title
+      title: props.title,
+      onClick: props.onClick,
+      onBlur: props.onBlur
     }
   }
 

@@ -10,6 +10,17 @@ router.get('/loggroups', async (req, res) =>{
   res.json(logGroups)
 })
 
+router.post('/loggroups', BodyValidator.LogGroup, async (req, res) =>{
+  const result = await db.addGroup(req.body)
+
+  res.status(201).json(result)
+})
+
+router.patch('/loggroups/:id', BodyValidator.EditLogGroup, async (req, res) =>{
+  const result = await db.editGroup(req.body, Number(req.params.id))
+  res.json(result)
+})
+
 router.get('/logrecords', async (req, res) =>{
 
   const logResults = await db.getAllRecords(Number(req.query.groupId))
@@ -18,10 +29,6 @@ router.get('/logrecords', async (req, res) =>{
   
 })
 
-router.post('/loggroups', BodyValidator.LogGroup, async (req, res) =>{
-  const result = await db.addGroup(req.body)
 
-  res.status(201).json(result)
-})
 
 export default router

@@ -16,20 +16,23 @@ export interface ILogGroupContext {
 
 type Props = ILogGroupContext & {children?: ReactNode}
 
-export const LogGroupContext = React.createContext<ILogGroupContext | undefined>(undefined)
+export const LogGroupContext = React.createContext<ILogGroupContext>({
+  reload: () => {},
+  logGroup: new LogGroup()
+})
 
 export class LGProvider extends React.Component<Props>{
   formBuilder: FormBuilder
   
   constructor(props: Props){
     super(props)
-    console.log(props.logGroup)
 
     this.formBuilder = (form) => {
-      
       const nameInput = new SimpleTextInput('name')
       nameInput.useContainer = false
       nameInput.useInputBox = false
+      nameInput.value = props.logGroup.name
+      nameInput.placeholder = 'Enter Name'
 
       const dateEntry = new SimpleDateInput('date-entry')
       dateEntry.inputClass = 'entry-input entry-date'

@@ -65,6 +65,7 @@ footer{
 .log-group-head{
   padding: 15px;
   background: var(--header-bg);
+  height: 60px;
 }
 
 .log-group-head:hover{
@@ -96,7 +97,7 @@ footer{
 
 .record-lower{
   min-height: 150px;
-  max-height: 80vh;
+  max-height: 60vh;
   overflow-y: auto;
 }
 
@@ -212,4 +213,24 @@ footer{
 
 .log-group-head:hover .edit-pen{
   opacity: 1;
+}
+
+.edit-title-input{
+  background: transparent;
+  
+  outline: none;
+  font-size: 20px;
+}
+
+.edit-title-input.group-title-box{
+  border-top: 2px solid transparent;
+  border-left: 2px solid transparent;
+  border-right: 2px solid transparent;
+  border-bottom: 2px solid rgb(138, 138, 138);
+  color: white;
+}
+
+.group-title-box{
+  border: 2px solid transparent;
+  padding: 5px 0;
 }
