@@ -38,8 +38,6 @@ export default class NameEditor extends Component<Props>{
     }, this.props.logGroup.id!)
 
     const onSuccess = (result: ILogGroup, queryClient: QueryClient) => {
-      const np = this.getNameInput()
-
       queryClient.setQueryData(['log-collection'], (old: LogCollection) =>{
         const replaceIndex = old.logGroups.findIndex(lg => lg.id === result.id)
         old.logGroups[replaceIndex] = LogGroup.Instance(result, old)

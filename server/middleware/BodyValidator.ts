@@ -1,7 +1,7 @@
 import { RequestHandler } from "express";
 import { ILogGroup } from "../../models/classes/LogGroup";
 import ProblemDetails from "../ProblemDetails";
-import { MetricHandler } from "../../models/MetricHandler";
+import { MetricHandler } from "../../models/classes/MetricHandler";
 import Util from "../Util";
 import { ILogRecord } from "../../models/classes/LogRecord";
 import Dict from "../../models/Dict";

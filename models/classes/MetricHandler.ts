@@ -1,16 +1,18 @@
 class Unit{
   metric: Metric
+  alias: string
   convertToBase: (x: number) => number
-  constructor(metric: Metric, convertToBase: (x: number) => number){
+  constructor(metric: Metric, alias: string, convertToBase: (x: number) => number){
     this.metric = metric
+    this.alias = alias
     this.convertToBase = convertToBase
   }
 }
 
 class BaseUnit extends Unit{
   converters: Map<string, (x: number) => number>
-  constructor(metric: Metric, convertToBase: (x: number) => number){
-    super(metric, convertToBase)
+  constructor(metric: Metric, alias: string, convertToBase: (x: number) => number){
+    super(metric, alias, convertToBase)
     this.converters = new Map<string, (x: number) => number>()
   }
 }
@@ -18,10 +20,12 @@ class BaseUnit extends Unit{
 class Metric{
   units: Map<string, Unit>
   baseUnit: string
+  alias: string
 
-  constructor(baseUnit: string){
+  constructor(baseUnit: string, alias: string){
     this.units = new Map<string, Unit>()
     this.baseUnit = baseUnit
+    this.alias = alias
   }
 
   getBase(){
@@ -40,26 +44,26 @@ class MetricBuilder{
 export const MetricHandler = (function(){
   const builder = new MetricBuilder()
 
-  const length = new Metric('M')
-  const metre = length.units.set('M', new BaseUnit(length, x => x))
-              .set('cm', new Unit(length, x => x / 100))
-              .set('km', new Unit(length, x => x * 1000))
+  const length = new Metric('M', 'Length')
+  const metre = length.units.set('cm', new Unit(length, 'Centimeter', x => x / 100))
+              .set('M', new BaseUnit(length, 'Meter', x => x))
+              .set('km', new Unit(length, 'Kilometer', x => x * 1000))
               .get('M') as BaseUnit
   metre.converters.set('cm', x => x * 100)
                   .set('km', x => x / 1000)
                   .set('M', x => x)
 
-  const mass = new Metric('kg')
-  const kg = mass.units.set('kg', new BaseUnit(mass, x => x))
-            .set('g', new Unit(mass, x => x / 1000))
-            .set('lb', new Unit(mass, x => x * 0.45359237))
+  const mass = new Metric('kg', 'Weight')
+  const kg = mass.units.set('kg', new BaseUnit(mass, 'Kilogram', x => x))
+            .set('g', new Unit(mass, 'Gram', x => x / 1000))
+            .set('lb', new Unit(mass, 'Pound', x => x * 0.45359237))
             .get('kg') as BaseUnit
   kg.converters.set('kg', x => x)
                .set('g', x => x * 1000)
                .set('lb', x => x / 0.45359237)
 
-  const unit = new Metric('unit')
-  const baseUnit = unit.units.set('unit', new BaseUnit(unit, x => x)).get('unit') as BaseUnit
+  const unit = new Metric('unit', 'Unit')
+  const baseUnit = unit.units.set('unit', new BaseUnit(unit, 'Unit', x => x)).get('unit') as BaseUnit
   baseUnit.converters.set('unit', x => x)
 
   builder.metrics.set('length', length).set('mass', mass).set('unit', unit)
@@ -90,10 +94,39 @@ export const MetricHandler = (function(){
   const hasUnit = function(metric: string, unit: string){
     return Boolean(builder.metrics.get(metric)?.units.get(unit))
   }
+
+  const getMetricAliases = function(){
+    return Array.from(builder.metrics.entries(), ([key, value]) =>{
+      return value.alias
+    })
+  }
+
+  const getUnitAliases = function(metric: string){
+    return Array.from(builder.metrics.get(metric)!.units.entries(), ([key, value]) =>{
+      return value.alias
+    })
+  }
+
+  const getMetrics = function(){
+    return Array.from(builder.metrics.entries())
+  }
+
+  const getUnits = function(metric: string){
+    return Array.from(builder.metrics.get(metric)!.units.entries())
+  }
+
+  const getBaseUnit = function(metric: string){
+    return builder.metrics.get(metric)?.baseUnit
+  }
   
   return {
     convertTo,
     hasMetric,
-    hasUnit
+    hasUnit,
+    getMetricAliases,
+    getUnitAliases,
+    getMetrics,
+    getUnits,
+    getBaseUnit
   }
 })()

@@ -152,6 +152,52 @@ footer{
   /*width: calc( (var(--record-sheet-width) - 2*var(--record-head-padding) - var(--record-cell-height) - var(--record-entry-items)*var(--record-entry-gap)) / 2);*/
 }
 
+.sf-dropdown-open > .sf-dropdown-button{
+  border-bottom-right-radius: 0;
+  border-bottom-left-radius: 0 !important;
+}
+
+.sf-dropdown-button{
+  border-top-left-radius: 3px;
+  border-top-right-radius: 3px;
+  border-bottom-right-radius: 3px;
+  border-bottom-left-radius: 3px;
+  padding: 0 5px;
+}
+
+.metric-entry > .sf-dropdown-button{
+  height: var(--record-entry-height);
+  border: var(--record-sheet-border);
+}
+
+.metric-entry > .sf-dropdown-content{
+  border-left: var(--record-sheet-border);
+  border-right: var(--record-sheet-border);
+  border-bottom: var(--record-sheet-border);
+}
+
+.sf-dropdown-option{
+  padding: 2px 5px;
+  cursor: pointer;
+}
+
+.sf-dropdown-button{
+  display: flex;
+  align-items: center;
+}
+
+.sf-dropdown-option:hover{
+  background-color: #eee;
+}
+
+.sf-dropdown-option.sf-selected{
+  background-color: rgb(178, 218, 255) !important;
+}
+
+.metric-dropdown-con{
+  width: 50%;
+}
+
 .entry-date{
   /*width: calc( (var(--record-sheet-width) - 2*var(--record-head-padding)) / 2 - var(--record-entry-gap) / 2);*/
   flex-grow: 1;

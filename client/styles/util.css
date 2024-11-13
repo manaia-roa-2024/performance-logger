@@ -41,6 +41,10 @@
   flex-direction: column;
 }
 
+.g3{
+  gap: 3px;
+}
+
 .g5{
   gap: 5px;
 }

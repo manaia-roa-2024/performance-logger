@@ -1,8 +1,9 @@
 import { ReactNode } from "react";
 import SimpleInput from "./SimpleInput";
+import { DropdownOptions } from "../Components/Dropdown/DropdownTypes";
 
-export default class PickOneDropdownInput extends SimpleInput<number>{
-  options: Array<string>
+export default class PickOneDropdownInput<K=string> extends SimpleInput<number>{
+  options: DropdownOptions<K>
   defaultButtonText: string | undefined
   angleIcon: ReactNode | undefined
   
@@ -13,5 +14,17 @@ export default class PickOneDropdownInput extends SimpleInput<number>{
     this.angleIcon = undefined
 
     this.options = []
+  }
+
+  getSelectedOption(){
+    return this.value == null ? undefined : this.options[this.value]
+  }
+
+  getSelectedKey(){
+    return this.getSelectedOption()?.key
+  }
+
+  getSelectedValue(){
+    return this.getSelectedOption()?.value
   }
 }

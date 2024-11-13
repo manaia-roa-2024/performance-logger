@@ -13,6 +13,7 @@ import { faCaretRight } from '@fortawesome/free-solid-svg-icons'
 import CNumberInput from '../SimpleForm/Components/CNumberInput'
 import { ILogGroupContext, LogGroupContext } from './LGContext'
 import { CLogRecord } from './CLogRecord'
+import CPickOneDropdown from '../SimpleForm/Components/CPickOneDropdown'
 
 interface Props {
   logRecords: LogRecord[]
@@ -104,6 +105,10 @@ class InnerSheet extends Component<Props> {
                 }}
               </LogGroupContext.Consumer>
             </Box>
+          </Box>
+          <Box className="aic entry-row">
+            <CPickOneDropdown input='metric-dropdown'/>
+            <CPickOneDropdown input='unit-dropdown'/>
           </Box>
         </VertBox>
         <VertBox className="record-lower thin-scrollbar">

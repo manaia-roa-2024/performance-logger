@@ -25,7 +25,7 @@ export default class LogGroup implements ILogGroup{
   constructor(){
     this.id = undefined
     this.name = 'New Performance Log'
-    this.metric = 'M'
+    this.metric = ''
     this.unit = ''
     this.created = undefined
 
@@ -43,6 +43,8 @@ export default class LogGroup implements ILogGroup{
     lg.id = json.id
     lg.name = json.name
     lg.logCollection = logCollection
+    lg.metric = json.metric
+    lg.unit = json.unit
 
     return lg
   }
