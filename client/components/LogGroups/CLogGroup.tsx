@@ -68,7 +68,7 @@ export default class CLogGroup extends QueryComponent<Props, State> {
       return <p>There was an error loading your records</p>
 
     return (
-      <LGProvider reload={() => this.forceUpdate()} logGroup={this.props.logGroup}>
+      <LGProvider logGroup={this.props.logGroup}>
         <VertBox className="log-group black-border c-white">
           <LGHead onClick={() => this.headClick()} open={this.state.open} groupName={this.props.logGroup.name}/>
           <div ref={this.lowerRef} className={cls('log-lower', 'c-black', !this.state.open && 'closed')}

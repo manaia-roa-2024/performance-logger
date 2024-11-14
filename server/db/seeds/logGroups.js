@@ -1,4 +1,5 @@
 import randomDateTime from "../../../randomDateTime.js"
+import Util from "../../Util.ts"
 
 const rdt = (start) =>{ // random datetime iso format
   return randomDateTime(start || new Date(2024, 0, 1), new Date(2024, 10, 9)).toISOString()
@@ -35,37 +36,55 @@ const seedLogGroups = [
   }
 ]
 
+const getPrev = (records, groupId) =>{
+  return records[records.length - 1]?.logGroupId === groupId ? records[records.length - 1] : null
+}
+
 const seedRecords = (function(){
   const records = []
+
+  let recordDate = randomDateTime(new Date(2023, 11, 31), new Date(2024, 5, 30))
 
   for (let i = 0; i < 49; i++){
     const lg = seedLogGroups[1]
 
+    recordDate.setDate(recordDate.getDate() + 1)
+
     records.push({
       value: (8 + Math.random() * 30).toFixed(2),
-      date: rd(new Date(lg.created)),
+      date: Util.toISODate(recordDate),
       created: rdt(new Date(lg.created)),
       logGroupId: 2
     })
   }
 
+
+  recordDate = randomDateTime(new Date(2023, 11, 31), new Date(2024, 5, 30))
+
   for (let i = 0; i < 49; i++){
     const lg = seedLogGroups[2]
 
+    recordDate.setDate(recordDate.getDate() + 1)
+    const prev = getPrev(records, 3)
+
     records.push({
-      value: 85 - (0.1 * i),
-      date: rd(new Date(lg.created)),
+      value: (Number(prev?.value ?? 85) + (Math.random() * 0.7 - 0.5)).toFixed(1),
+      date: Util.toISODate(recordDate),
       created: rdt(new Date(lg.created)),
       logGroupId: 3
     })
   }
 
+  recordDate = randomDateTime(new Date(2023, 11, 31), new Date(2024, 5, 30))
+
   for (let i = 0; i < 49; i++){
     const lg = seedLogGroups[3]
 
+    recordDate.setDate(recordDate.getDate() + 1)
+
     records.push({
-      value: Math.round(140 + (0.25 * i)),
-      date: rd(new Date(lg.created)),
+      value: (1.4 + (0.0025 * i)).toFixed(4),
+      date: Util.toISODate(recordDate),
       created: rdt(new Date(lg.created)),
       logGroupId: 4
     })

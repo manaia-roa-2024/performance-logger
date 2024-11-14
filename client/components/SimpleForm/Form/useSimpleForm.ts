@@ -11,7 +11,8 @@ export default function useSimpleForm<T extends object>(id: string, callback?: (
     if (!callback) return
 
     const form = new SimpleForm<T>(id)
-    form.reload = reload
+
+    form.reload = context.getForm(id)?.reload ?? reload
 
     callback(form)
 
