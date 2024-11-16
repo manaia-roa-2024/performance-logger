@@ -1,8 +1,14 @@
+import { build } from "vite"
+import UnitConverters from "./BaseConverters"
+
+export type BaseConverter = (x: string) => (number | null)
+export type FromBaseConverter = (x: number) => string
+
 class Unit{
   metric: Metric
   alias: string
-  convertToBase: (x: number) => number
-  constructor(metric: Metric, alias: string, convertToBase: (x: number) => number){
+  convertToBase: BaseConverter
+  constructor(metric: Metric, alias: string, convertToBase: BaseConverter){
     this.metric = metric
     this.alias = alias
     this.convertToBase = convertToBase
@@ -10,10 +16,10 @@ class Unit{
 }
 
 class BaseUnit extends Unit{
-  converters: Map<string, (x: number) => number>
-  constructor(metric: Metric, alias: string, convertToBase: (x: number) => number){
-    super(metric, alias, convertToBase)
-    this.converters = new Map<string, (x: number) => number>()
+  converters: Map<string, (x: number) => string>
+  constructor(metric: Metric, alias: string){
+    super(metric, alias, UnitConverters.Identity.toBase)
+    this.converters = new Map()
   }
 }
 
@@ -45,30 +51,30 @@ export const MetricHandler = (function(){
   const builder = new MetricBuilder()
 
   const length = new Metric('M', 'Length')
-  const metre = length.units.set('cm', new Unit(length, 'Centimeter', x => x / 100))
-              .set('M', new BaseUnit(length, 'Meter', x => x))
-              .set('km', new Unit(length, 'Kilometer', x => x * 1000))
+  const metre = length.units.set('cm', new Unit(length, 'Centimeter', UnitConverters.cm.toBase))
+              .set('M', new BaseUnit(length, 'Meter'))
+              .set('km', new Unit(length, 'Kilometer', UnitConverters.km.toBase))
               .get('M') as BaseUnit
-  metre.converters.set('cm', x => x * 100)
-                  .set('km', x => x / 1000)
-                  .set('M', x => x)
+  metre.converters.set('cm', UnitConverters.cm.fromBase)
+                  .set('km', UnitConverters.km.fromBase)
+                  .set('M', UnitConverters.Identity.fromBase)
 
   const mass = new Metric('kg', 'Weight')
-  const kg = mass.units.set('kg', new BaseUnit(mass, 'Kilogram', x => x))
-            .set('g', new Unit(mass, 'Gram', x => x / 1000))
-            .set('lb', new Unit(mass, 'Pound', x => x * 0.45359237))
+  const kg = mass.units.set('kg', new BaseUnit(mass, 'Kilogram'))
+            .set('g', new Unit(mass, 'Gram', UnitConverters.g.toBase))
+            .set('lb', new Unit(mass, 'Pound', UnitConverters.lb.toBase))
             .get('kg') as BaseUnit
-  kg.converters.set('kg', x => x)
-               .set('g', x => x * 1000)
-               .set('lb', x => x / 0.45359237)
+  kg.converters.set('kg', UnitConverters.Identity.fromBase)
+               .set('g', UnitConverters.g.fromBase)
+               .set('lb', UnitConverters.lb.fromBase)
 
   const unit = new Metric('unit', 'Unit')
-  const baseUnit = unit.units.set('unit', new BaseUnit(unit, 'Unit', x => x)).get('unit') as BaseUnit
-  baseUnit.converters.set('unit', x => x)
+  const baseUnit = unit.units.set('unit', new BaseUnit(unit, 'Unit')).get('unit') as BaseUnit
+  baseUnit.converters.set('unit', UnitConverters.Identity.fromBase)
 
   builder.metrics.set('length', length).set('mass', mass).set('unit', unit)
   
-  const convertTo = function(fromMetricCode: string, fromUnitCode: string, toMetricCode: string, toUnitCode: string, value: number){
+  const convertTo = function(fromMetricCode: string, fromUnitCode: string, toMetricCode: string, toUnitCode: string, value: string){
 
     const fromMetric = builder.metrics.get(fromMetricCode)
     const fromUnit = fromMetric?.units.get(fromUnitCode)
@@ -78,13 +84,33 @@ export const MetricHandler = (function(){
     if (!fromMetric || !fromUnit || !toMetric || !toUnit)
       throw new Error('One of the metrics or units is invalid')
 
-    const baseValue = fromUnit.convertToBase(value)!
+    const baseValue = fromUnit.convertToBase(value)
 
+    if (baseValue == null){
+      console.error(`Cannot convert value ${value} from ${fromMetricCode}(${fromUnitCode}) to ${toMetricCode}(${toUnitCode})`)
+      return null
+    }
     //console.log(toMetricCode, toUnitCode, toMetric)
 
     const converterFn = toMetric.getBase().converters.get(toUnitCode)!
 
     return converterFn(baseValue)
+  }
+
+  const convertToBase = (metric: string, unit: string, value: string) => {
+    const baseUnit = builder.metrics.get(metric)?.baseUnit
+    if (baseUnit == null)
+      throw new Error(`Invalid metric of ${metric}(${unit})`)
+
+    return Number(convertTo(metric, unit, metric, baseUnit, value))
+  }
+
+  const convertFromBase = (metric: string, toUnit: string, value: number) => {
+    const baseUnit = builder.metrics.get(metric)?.baseUnit
+    if (baseUnit == null)
+      throw new Error(`Invalid metric of ${metric}(${unit})`)
+
+    return convertTo(metric, baseUnit, metric, toUnit, value.toString())
   }
 
   const hasMetric = function(metric: string){
@@ -127,6 +153,8 @@ export const MetricHandler = (function(){
     getUnitAliases,
     getMetrics,
     getUnits,
-    getBaseUnit
+    getBaseUnit,
+    convertToBase,
+    convertFromBase
   }
 })()

@@ -6,7 +6,7 @@ export default function CellInput(logRecord: LogRecord){
   const input = new SimpleTextInput('record-input-' + logRecord.id)
   const metric = logRecord.logGroup!.metric
   const unit = logRecord.logGroup!.unit
-  input.value = MetricHandler.convertTo(metric, MetricHandler.getBaseUnit(metric)!, metric, unit, logRecord.value).toFixed(2)//logRecord.value.toString()
+  //input.value = MetricHandler.convertTo(metric, MetricHandler.getBaseUnit(metric)!, metric, unit, logRecord.value).toString()//logRecord.value.toString()
   input.inputClass = 'cell-input'
   input.useContainer = false
   input.useInputBox = false

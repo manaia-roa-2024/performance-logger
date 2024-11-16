@@ -1,5 +1,6 @@
+import getDateSorter from "../../client/dateSorter";
 import LogCollection from "./LogCollection";
-import LogRecord from "./LogRecord";
+import LogRecord, { ILogRecord } from "./LogRecord";
 
 //nullable means db determined
 export interface ILogGroup{
@@ -35,6 +36,20 @@ export default class LogGroup implements ILogGroup{
 
   formId(){
     return 'record-sheet-' + this.id
+  }
+
+  setRecords(records: Array<LogRecord>){
+    this.logRecords = records
+    for (const rec of records){
+      rec.logGroup = this
+    }
+  }
+
+  addRecordFromJson(record: ILogRecord){
+    const instance = LogRecord.Instance(record, this)
+    this.logRecords.push(instance)
+    this.logRecords.sort(getDateSorter(false))
+    return instance
   }
 
   static Instance(json: ILogGroup, logCollection: LogCollection){

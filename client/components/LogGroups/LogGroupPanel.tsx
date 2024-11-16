@@ -26,7 +26,7 @@ export default class LogGroupPanel extends QueryComponent {
         {data.logGroups.map((group, index) => {
           return <CLogGroup key={group.id} logGroup={group} />
         })}
-        <FormLogger/>
+        {/*<FormLogger/>*/}
       </VertBox>
     )
   }

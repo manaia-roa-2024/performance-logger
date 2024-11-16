@@ -48,3 +48,14 @@ export async function deleteGroup(id: number){
   await connection('logGroup')
     .where({id}).delete()
 }
+
+export async function addRecord(record: ILogRecord){
+  const result = await connection<ILogRecord>('logRecord')
+    .insert({
+      value: record.value,
+      date: record.date,
+      created: Util.createTimeStamp(),
+      logGroupId: record.logGroupId
+    }, '*')
+  return result[0]
+}

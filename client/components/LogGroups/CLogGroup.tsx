@@ -66,7 +66,7 @@ export default class CLogGroup extends QueryComponent<Props, State> {
 
     if (isError || !logRecords)
       return <p>There was an error loading your records</p>
-
+    console.log("Rendering", this.props.logGroup.name)
     return (
       <LGProvider logGroup={this.props.logGroup}>
         <VertBox className="log-group black-border c-white">
@@ -74,7 +74,7 @@ export default class CLogGroup extends QueryComponent<Props, State> {
           <div ref={this.lowerRef} className={cls('log-lower', 'c-black', !this.state.open && 'closed')}
             style={{ height: this.state.open ? undefined : '0' }}>
             <Box className="log-inner">
-              <RecordSheet logRecords={logRecords} />
+              <RecordSheet logRecords={this.props.logGroup.logRecords} />
               <GroupMain/>
             </Box>
           </div>

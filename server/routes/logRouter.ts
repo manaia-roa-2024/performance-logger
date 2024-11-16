@@ -30,8 +30,12 @@ router.get('/logrecords', async (req, res) =>{
 
   const logResults = await db.getAllRecords(Number(req.query.groupId))
   
-  res.json(logResults)
-  
+  res.status(201).json(logResults)
+})
+
+router.post('/logrecord', BodyValidator.LogRecord, async (req, res) =>{
+  const result = await db.addRecord(req.body)
+  return res.json(result)
 })
 
 

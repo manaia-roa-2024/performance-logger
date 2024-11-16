@@ -12,6 +12,16 @@ export default class LogCollection{
     logGroup.logCollection = this
   }
 
+  updateGroup(updatedGroup: LogGroup){
+    for (let i = 0; i < this.logGroups.length; i++){
+      const lg = this.logGroups[i]
+      if (lg.id === updatedGroup.id){
+        updatedGroup.setRecords(lg.logRecords)
+        this.logGroups[i] = updatedGroup
+      }
+    }
+  }
+
   static Instance(logGroups: Array<ILogGroup>){
     const collection = new LogCollection()
     for (const lg of logGroups){

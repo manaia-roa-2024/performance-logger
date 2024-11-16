@@ -1,4 +1,5 @@
 import LogGroup from "./LogGroup";
+import { MetricHandler } from "./MetricHandler";
 
 //nullable means db determined
 export interface ILogRecord{
@@ -28,6 +29,10 @@ export default class LogRecord implements ILogRecord{
     this.logGroupId = logGroupId
 
     this.logGroup = undefined
+  }
+
+  getConvertedValue(): string{
+    return MetricHandler.convertFromBase(this.logGroup!.metric, this.logGroup!.unit, this.value) || ''
   }
 
   static Instance(json: ILogRecord, logGroup: LogGroup){

@@ -1,7 +1,5 @@
 import { Component, ReactNode } from 'react'
-import LogRecord from '../../../models/classes/LogRecord'
-import SimpleFormContainer from '../SimpleForm/Form/SimpleFormContainer'
-import SimpleForm, { FormBuilder } from '../SimpleForm/Form/SimpleForm'
+import LogRecord, { ILogRecord } from '../../../models/classes/LogRecord'
 import { SimpleFormInstanceContext } from '../SimpleForm/Form/SimpleFormInstance'
 import { Box, VertBox } from '../Box'
 import SimpleDateInput from '../SimpleForm/Inputs/SimpleDateInput'
@@ -14,32 +12,25 @@ import CNumberInput from '../SimpleForm/Components/CNumberInput'
 import { ILogGroupContext, LogGroupContext } from './LGContext'
 import { CLogRecord } from './CLogRecord'
 import CPickOneDropdown from '../SimpleForm/Components/CPickOneDropdown'
+import { MetricHandler } from '../../../models/classes/MetricHandler'
+import { SimpleNumberInput } from '../SimpleForm/Inputs/SimpleNumberInput'
+import { addLogRecord } from '../../apis/addLogRecord'
+import MutationComponent from '../MutationComponent'
+import { QueryClient, UseMutateFunction } from '@tanstack/react-query'
+import getDateSorter from '../../dateSorter'
+import CellInput from '../InputTemplates/CellInput'
 
 interface Props {
   logRecords: LogRecord[]
 }
 
 export default class RecordSheet extends Component<Props> {
-
-  constructor(props: Props) {
-    super(props)
-
-  }
-
-  render() {
-    return (
-              <InnerSheet {...this.props} />
-          )
-  }
-}
-
-class InnerSheet extends Component<Props> {
   static contextType = SimpleFormInstanceContext
 
   context!: React.ContextType<typeof SimpleFormInstanceContext>
 
   incrementEntryDate(incrementer: number) {
-    if (!this.context) return
+    if (!this.context.form) return
     const dateInput = this.context.form.getInput(
       'date-entry',
     ) as SimpleDateInput
@@ -48,23 +39,38 @@ class InnerSheet extends Component<Props> {
     dateInput.updateValue(SimpleDateInput.toISODate(asDate))
   }
 
-  addNewEntry(context: ILogGroupContext) {
-    /*if (!this.context) return
-    const dateInput = this.context.form.getInput(
-      'date-entry',
-    ) as SimpleDateInput
-    const valueInput = this.context.form.getInput(
-      'value-entry',
-    ) as SimpleNumberInput
-    const record = new LogRecord()
-    record.id = this.props.logRecords.length + 1
-    record.logGroup = this.props.logRecords[0].logGroup
-    record.value = valueInput.getFormattedValue()
-    record.date = dateInput.value!
-    this.props.logRecords.push(record)
-    this.context.form.addInput(CellInput(record))
-    //context.correctHeightFn()
-    this.forceUpdate()*/
+  addNewEntry(context: ILogGroupContext, mutate: UseMutateFunction<unknown, Error, ILogRecord, unknown>) {
+    const lg = context.logGroup
+    const valueEntry = this.context.form?.getInput('value-entry') as SimpleNumberInput
+
+    if (!valueEntry)
+      return console.error("Value entry could not be found")
+
+    if (valueEntry.value == null || valueEntry.value === '' || !valueEntry.validNumReg.test(valueEntry.value)){
+      console.error("Invalid entry from the get go")
+      return
+    }
+    const converted = MetricHandler.convertToBase(lg.metric, lg.unit, valueEntry.value)
+
+    if (converted == null){
+      console.error("Conversion fail")
+      return
+    }
+    console.log(`Conversion: ${valueEntry.value} -> ${converted}`)
+
+    mutate({
+      value: converted,
+      logGroupId: context.logGroup.id!,
+      date: this.getDateEntry().value!
+    })
+  }
+
+  getDateEntry(){
+    return this.context.form!.getInput('date-entry') as SimpleDateInput
+  }
+
+  getValueEntry(){
+    return this.context.form!.getInput('value-entry') as SimpleNumberInput
   }
 
   render(): ReactNode {
@@ -90,17 +96,37 @@ class InnerSheet extends Component<Props> {
             </Box>
             <Box className="value-plus-box">
               <LogGroupContext.Consumer>
-                {(context: ILogGroupContext | undefined) => {
+                {(context: ILogGroupContext) => {
+
+                  const mutationFn = (newRecord: ILogRecord) => addLogRecord(newRecord)
+
+                  const onSuccess = (result: ILogRecord, queryClient: QueryClient) =>{
+                    queryClient.setQueryData(['records', context.logGroup.id!.toString()], (old: number) =>{
+                      const asRecord = context.logGroup.addRecordFromJson(result)
+
+                      const input = CellInput(asRecord)
+                      this.context.form?.addInput(input)
+                      input.value = asRecord.getConvertedValue()
+
+                      return (old + 1) % 1_000_000
+                    }, {})
+
+                    this.incrementEntryDate(1)
+                    this.getValueEntry().updateValue('')
+                  }
                   return (
-                    <>
-                      <CNumberInput input="value-entry" />
-                      <div
-                        className="simple-center data-entry-plus"
-                        onClick={() => this.addNewEntry(context!)}
-                      >
-                        <FontAwesomeIcon icon={faPlus} />
-                      </div>
-                    </>
+                    <MutationComponent mutationFn={mutationFn} onSuccess={onSuccess}>
+                      {
+                        ({mutate}) => {
+                          return <>
+                            <CNumberInput input="value-entry" onKeyDown={(e) => {if (e.key === 'Enter') this.addNewEntry(context!, mutate)}}/>
+                            <div className="simple-center data-entry-plus" onClick={() => this.addNewEntry(context!, mutate)}>
+                              <FontAwesomeIcon icon={faPlus} />
+                            </div>
+                          </>
+                        }
+                      }
+                    </MutationComponent>
                   )
                 }}
               </LogGroupContext.Consumer>

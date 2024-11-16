@@ -82,17 +82,20 @@ export class LGProvider extends React.Component<Props>{
       for (const logRecord of logGroup.logRecords) {
         form.addInput(CellInput(logRecord))
       }
+      this.updateCellValues(props.logGroup, form)
 
       form.addInputs(nameInput, dateEntry, valueEntry, metricDropdown, unitDropdown)
     }
   }
 
   updateCellValues(logGroup: LogGroup, form: SimpleForm<object>){
-    console.log(logGroup)
+    //console.log(logGroup)
     for (const record of logGroup.logRecords){
       const input = form.getInput('record-input-' + record.id)!
-      const newValue = MetricHandler.convertTo(logGroup.metric, MetricHandler.getBaseUnit(logGroup.metric)!, logGroup.metric, logGroup.unit, record.value).toFixed(2)
-      input.value = newValue
+      const newValue = MetricHandler.convertTo(logGroup.metric, MetricHandler.getBaseUnit(logGroup.metric)!, logGroup.metric, logGroup.unit, record.value.toString())
+      if (newValue == null)
+        return console.error("Conversion fail")
+      input.value = newValue.toString()
     }
   }
 
@@ -121,9 +124,6 @@ export class LGProvider extends React.Component<Props>{
     return this.getUnitDropdown().getSelectedOption()?.key
   }
 
-  componentDidMount(): void {
-    console.log("Moutned")
-  }
 
   /*shouldComponentUpdate(nextProps: Readonly<Props>, nextState: Readonly<{}>, nextContext: any): boolean {
     if (this.props.logGroup.unit !== nextProps.logGroup.unit){
@@ -155,11 +155,8 @@ export class LGProvider extends React.Component<Props>{
 
             const onSuccess = (result: ILogGroup, queryClient: QueryClient) =>{
               queryClient.setQueryData(['log-collection'], (old: LogCollection) =>{
-                console.log(old)
-                const replaceIndex = old.logGroups.findIndex(lg => lg.id === result.id)
-                const oldLogGroup = old.logGroups[replaceIndex]
                 const newLogGroup = LogGroup.Instance(result, old)
-                newLogGroup.logRecords = oldLogGroup.logRecords
+                old.updateGroup(newLogGroup)
                 const clone = LogCollection.Clone(old)
                 this.updateCellValues(newLogGroup, this.getForm())
                 return clone
