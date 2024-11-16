@@ -52,6 +52,14 @@ export default class LogGroup implements ILogGroup{
     return instance
   }
 
+  removeById(id: number){
+    const index = this.logRecords.findIndex(x => x.id === id)
+    if (index >= 0){
+      console.log("REMOVING ID NUMBER", id)
+      this.logRecords.splice(index, 1)
+    }
+  }
+
   static Instance(json: ILogGroup, logCollection: LogCollection){
     const lg = new LogGroup()
     

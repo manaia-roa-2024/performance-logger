@@ -4,6 +4,9 @@ import { SimpleFormInstanceContext } from '../SimpleForm/Form/SimpleFormInstance
 import { Box } from '../Box'
 import { ILogGroupContext, LogGroupContext } from './LGContext'
 import CTextInput from '../SimpleForm/Components/CTextInput'
+import MutationComponent from '../MutationComponent'
+import deleteRecord from '../../apis/deleteRecord'
+import { QueryClient, UseMutateFunction } from '@tanstack/react-query'
 
 
 export class CLogRecord extends Component<{ logRecord: LogRecord }> {
@@ -13,8 +16,9 @@ export class CLogRecord extends Component<{ logRecord: LogRecord }> {
 
   render() {
 
-    const keyDown = (e: React.KeyboardEvent<HTMLInputElement>, lgContext: ILogGroupContext) => {
+    const keyDown = (e: React.KeyboardEvent<HTMLInputElement>, mutate: UseMutateFunction<unknown, Error, number, unknown>) => {
       if (e.key === 'Delete') {
+        mutate(this.props.logRecord.id!)
         /*console.log(lgContext)
         const index = lgContext.logGroup.logRecords.indexOf(this.props.logRecord)
         lgContext.logGroup.logRecords.splice(index, 1)
@@ -23,21 +27,37 @@ export class CLogRecord extends Component<{ logRecord: LogRecord }> {
       }
     }
 
+    const mutationFn = (id: number) => deleteRecord(id)
+
+    const onSuccess = (result: unknown, queryClient: QueryClient) =>{
+      const id = this.props.logRecord.id!
+      console.log("Record deleted:", id)
+      queryClient.setQueryData(['records', this.props.logRecord.logGroup!.id!.toString()], (old: number) =>{
+        
+        this.props.logRecord.logGroup!.removeById(id)
+        return (old + 1) % 1_000_000
+      })
+      this.context.form!.removeInput('record-input-' + id)
+    }
+
     return (
-      <LogGroupContext.Consumer>
-        {(lgContext: ILogGroupContext | undefined) => {
-          return (
-            <Box className="record-row">
-              <div className="record-cell df aic">
-                {this.props.logRecord.date}
-              </div>
-              <div className="record-cell df aic">
-                <CTextInput input={'record-input-' + this.props.logRecord.id} onKeyDown={(e) => keyDown(e, lgContext!)}/>
-              </div>
-            </Box>
-          )
-        }}
-      </LogGroupContext.Consumer>
+      <MutationComponent mutationFn={mutationFn} onSuccess={onSuccess}>
+        {
+          ({mutate}) =>{
+            return (
+              <Box className="record-row">
+                <div className="record-cell df aic">
+                  {this.props.logRecord.date}
+                </div>
+                <div className="record-cell df aic">
+                  <CTextInput input={'record-input-' + this.props.logRecord.id} onKeyDown={(e) => keyDown(e, mutate)}/>
+                </div>
+              </Box>
+            )
+          }
+        } 
+      </MutationComponent>
+          
     )
   }
 }

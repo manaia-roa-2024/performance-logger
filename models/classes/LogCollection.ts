@@ -27,6 +27,9 @@ export default class LogCollection{
     for (const lg of logGroups){
       collection.addLogGroup(LogGroup.Instance(lg, collection))
     }
+
+    collection.logGroups = collection.logGroups.slice(0, 1)
+
     return collection
   }
 

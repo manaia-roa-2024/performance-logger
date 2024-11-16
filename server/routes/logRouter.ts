@@ -2,6 +2,7 @@ import { Router } from "express";
 
 import * as db from '../db/dbUtil.ts'
 import BodyValidator from "../middleware/BodyValidator.ts";
+import connection from "../db/connection.ts";
 
 const router = Router()
 
@@ -36,6 +37,14 @@ router.get('/logrecords', async (req, res) =>{
 router.post('/logrecord', BodyValidator.LogRecord, async (req, res) =>{
   const result = await db.addRecord(req.body)
   return res.json(result)
+})
+
+router.delete('/logrecord/:id', async (req, res) =>{
+  const result = await connection('logRecord')
+    .where({id: req.params.id})
+    .delete()
+  
+  res.sendStatus(201)
 })
 
 

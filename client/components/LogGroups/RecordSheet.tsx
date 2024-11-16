@@ -138,6 +138,7 @@ export default class RecordSheet extends Component<Props> {
           </Box>
         </VertBox>
         <VertBox className="record-lower thin-scrollbar">
+          <>{console.log(this.props.logRecords.length)}</>
           {this.props.logRecords.map((logRecord, index) => {
             return <CLogRecord key={logRecord.id} logRecord={logRecord} />
           })}
