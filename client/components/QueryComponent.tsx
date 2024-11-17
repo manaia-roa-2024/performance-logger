@@ -1,5 +1,5 @@
 import { QueryFunction, useQuery, UseQueryResult } from "@tanstack/react-query";
-import { Component, ReactNode } from "react";
+import { Component, ReactNode, useRef } from "react";
 
 interface QueryProps{
   queryKey: string[]
@@ -7,7 +7,9 @@ interface QueryProps{
 }
 
 function Query(props: QueryProps & {children: (result: UseQueryResult) => ReactNode}) {
-  const query = useQuery({queryKey: props.queryKey, queryFn: props.queryFn})
+  const hasRunOnce = useRef(false)
+  const query = useQuery({queryKey: props.queryKey, queryFn: props.queryFn, enabled: !hasRunOnce.current})
+  hasRunOnce.current = true
   return props.children(query);
 }
 

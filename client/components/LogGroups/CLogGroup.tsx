@@ -10,6 +10,7 @@ import getLogRecords from '../../apis/getLogRecords'
 import { LGProvider } from './LGContext'
 import LGHead from './LGHead'
 import GroupMain from './GroupMain/GroupMain'
+import { JSX } from 'react/jsx-runtime'
 
 interface Props {
   logGroup: LogGroup
@@ -22,17 +23,20 @@ interface State {
 
 export default class CLogGroup extends QueryComponent<Props, State> {
   lowerRef: RefObject<HTMLDivElement>
+  rand: number
 
   constructor(props: Props) {
-    super(props, ['records', props.logGroup.id!.toString()], () =>
-      getLogRecords(props.logGroup),
+    super(props, ['records', props.logGroup.id!.toString()], () =>{
+      console.log("In constructor callback", this.props.logGroup)
+      return getLogRecords(this.props.logGroup) 
+    }
     )
 
     this.state = {
       open: true,
       lowerHeight: '0',
     }
-
+    this.rand = Math.random()
     this.lowerRef = createRef()
   }
 
@@ -51,7 +55,6 @@ export default class CLogGroup extends QueryComponent<Props, State> {
 
     const child = element.children[0]
     const rect = child.getBoundingClientRect()
-    console.log('Correcting height')
     this.setState((prev) => {
       return { ...prev, lowerHeight: rect.height + 'px' }
     })
@@ -61,12 +64,19 @@ export default class CLogGroup extends QueryComponent<Props, State> {
     //this.correctLowerHeight()
   }
 
+
+  render(): JSX.Element {
+    this.queryFn = () =>{
+      return getLogRecords(this.props.logGroup) 
+    }
+    return super.render()
+  }
+
   renderQuery({data: logRecords, isPending, isError}: UseQueryResult<Array<LogRecord>>) {
     if (isPending) return <p>Pending...</p>
 
     if (isError || !logRecords)
       return <p>There was an error loading your records</p>
-    console.log("Rendering", this.props.logGroup.name)
     return (
       <LGProvider logGroup={this.props.logGroup}>
         <VertBox className="log-group black-border c-white">

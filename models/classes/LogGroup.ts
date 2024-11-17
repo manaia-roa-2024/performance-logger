@@ -1,6 +1,7 @@
-import getDateSorter from "../../client/dateSorter";
+import { Order } from "../Order";
 import LogCollection from "./LogCollection";
 import LogRecord, { ILogRecord } from "./LogRecord";
+import { MetricHandler } from "./MetricHandler";
 
 //nullable means db determined
 export interface ILogGroup{
@@ -11,6 +12,19 @@ export interface ILogGroup{
   unit: string
 }
 
+export interface RecordStats{
+  records: number
+  mean: number | 'N/A',
+  median: number | 'N/A',
+  max: number | 'N/A',
+  min: number | 'N/A',
+  [key: string]: number | 'N/A'
+}
+
+type AllString<T> = {
+  [key in keyof T]: string
+}
+
 export default class LogGroup implements ILogGroup{
   //db
   id?: number
@@ -18,6 +32,8 @@ export default class LogGroup implements ILogGroup{
   metric: string;
   unit: string
   created?: string
+
+  arand: number
 
   // entities
   logRecords: LogRecord[]
@@ -32,6 +48,48 @@ export default class LogGroup implements ILogGroup{
 
     this.logRecords = []
     this.logCollection = undefined
+
+    this.arand = Math.random()
+  }
+
+  getAnalytics(): AllString<RecordStats>{
+    const values = this.logRecords.map(lr => lr.value).sort((a, b) => a - b)
+
+    let median: 'N/A' | number
+    if (values.length === 0)
+      median = 'N/A'
+    else if (values.length % 2 === 0)
+      median = 0.5 * (values[values.length / 2] + values[values.length / 2 - 1])
+    else
+      median = values[Math.floor(values.length / 2)]
+
+    const total = values.reduce((prev, cur) => prev + cur, 0)
+      
+    const preliminary = {
+      min: values[0] || 'N/A',
+      max: values[values.length - 1] || 'N/A',
+      median,
+      mean: values.length === 0 ? 'N/A' : total / values.length,
+      records: values.length
+    } as RecordStats
+
+    const finalStats: AllString<RecordStats> = {
+      min: 'N/A',
+      max: 'N/A',
+      median: 'N/A',
+      mean: 'N/A',
+      records: 'N/A'
+    }
+
+    for (const key in preliminary){
+      const value = preliminary[key]
+      if (key === 'records' || value === 'N/A'){
+        finalStats[key] = value.toString()
+        continue
+      }
+      finalStats[key] = MetricHandler.convertFromBase(this.metric, this.unit, value)! + ' ' + MetricHandler.getCode(this.metric, this.unit)
+    }
+    return finalStats
   }
 
   formId(){
@@ -48,7 +106,7 @@ export default class LogGroup implements ILogGroup{
   addRecordFromJson(record: ILogRecord){
     const instance = LogRecord.Instance(record, this)
     this.logRecords.push(instance)
-    this.logRecords.sort(getDateSorter(false))
+    this.logRecords.sort(LogRecord.getSorter())
     return instance
   }
 
@@ -68,7 +126,16 @@ export default class LogGroup implements ILogGroup{
     lg.logCollection = logCollection
     lg.metric = json.metric
     lg.unit = json.unit
+    lg.created = json.created
 
     return lg
+  }
+
+  static getSorter(order: Order = "desc"){
+    return function(a: {created?: string}, b: {created?: string}){
+      const d1 = new Date(a.created!)
+      const d2 = new Date(b.created!)
+      return order === "asc" ? (d1.getTime() - d2.getTime()) : (d2.getTime() - d1.getTime())
+    }
   }
 }

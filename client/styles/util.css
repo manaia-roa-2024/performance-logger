@@ -20,6 +20,11 @@
   text-align: center;
 }
 
+
+.tar{
+  text-align: right;
+}
+
 .fs1{
   align-items: flex-start;
 }

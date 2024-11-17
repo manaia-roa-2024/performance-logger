@@ -20,7 +20,6 @@ export default class LogGroupPanel extends QueryComponent {
     if (isPending) return <p>Pending...</p>
 
     if (isError || !data) return <p>There was an error loading your records</p>
-
     return (
       <VertBox gap="40px">
         {data.logGroups.map((group, index) => {
