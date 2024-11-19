@@ -13,7 +13,7 @@ export default class Analytics extends Component{
     const group = this.context.logGroup
     const stats = group.getAnalytics()
 
-    return <div>
+    return <div className="gm-content">
       <VertBox className="analytics-box">
         <h5 className="tac">Analytics</h5>
         <VertBox className="analytics-table" gap='5px'>

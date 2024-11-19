@@ -23,7 +23,7 @@ export default class NameEditor extends Component<Props>{
   }
 
   getNameInput(){
-    return this.context!.form.getInput('name')! as SimpleTextInput
+    return this.context.form!.getInput('name')! as SimpleTextInput
   }
 
   componentDidMount(): void {
@@ -40,7 +40,9 @@ export default class NameEditor extends Component<Props>{
     const onSuccess = (result: ILogGroup, queryClient: QueryClient) => {
       queryClient.setQueryData(['log-collection'], (old: LogCollection) =>{
         const replaceIndex = old.logGroups.findIndex(lg => lg.id === result.id)
+        const oldGroup = old.logGroups[replaceIndex]
         old.logGroups[replaceIndex] = LogGroup.Instance(result, old)
+        old.logGroups[replaceIndex].setRecords(oldGroup.logRecords)
         return LogCollection.Clone(old)
       })
     }

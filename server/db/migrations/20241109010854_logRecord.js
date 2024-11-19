@@ -8,7 +8,7 @@ export async function up(knex) {
     table.double('value')
     table.date('date')
     table.datetime('created')
-    table.integer('logGroupId').references('logGroup.id')
+    table.integer('logGroupId').references('logGroup.id').onDelete('cascade')
   })
 };
 

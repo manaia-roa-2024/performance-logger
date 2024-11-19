@@ -87,7 +87,7 @@ export default class LogGroup implements ILogGroup{
         finalStats[key] = value.toString()
         continue
       }
-      finalStats[key] = MetricHandler.convertFromBase(this.metric, this.unit, value)! + ' ' + MetricHandler.getCode(this.metric, this.unit)
+      finalStats[key] = MetricHandler.convertFromBase(this.metric, this.unit, value)! + ' ' + (this.metric === 'unit' ? '' : MetricHandler.getCode(this.metric, this.unit))
     }
     return finalStats
   }

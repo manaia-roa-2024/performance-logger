@@ -77,7 +77,7 @@ export const MetricHandler = (function(){
 
   builder.metrics.set('length', length).set('mass', mass).set('unit', unit)
   
-  const convertTo = function(fromMetricCode: string, fromUnitCode: string, toMetricCode: string, toUnitCode: string, value: string, dp: number = 2){
+  const convertTo = function(fromMetricCode: string, fromUnitCode: string, toMetricCode: string, toUnitCode: string, value: string, dp: number = 4){
 
     const fromMetric = builder.metrics.get(fromMetricCode)
     const fromUnit = fromMetric?.units.get(fromUnitCode)
@@ -99,7 +99,7 @@ export const MetricHandler = (function(){
 
     const final = converterFn(baseValue)
     if (final !== '' && !isNaN(Number(final)))
-      return roundToX(Number(final), dp)//Number(final).toFixed(dp)
+      return roundToX(Number(final), dp).toString()//Number(final).toFixed(dp)
     return final
   }
 
@@ -108,10 +108,16 @@ export const MetricHandler = (function(){
     if (baseUnit == null)
       throw new Error(`Invalid metric of ${metric}(${unit})`)
 
-    return Number(convertTo(metric, unit, metric, baseUnit, value))
+    const converted = builder.metrics.get(metric)?.units.get(unit)?.convertToBase(value)
+
+    if (converted == null)
+      throw new Error(`Invalid metric or unit of ${metric}(${unit})`)
+    console.log(converted)
+    return converted
+    //return Number(convertTo(metric, unit, metric, baseUnit, value))
   }
 
-  const convertFromBase = (metric: string, toUnit: string, value: number, dp: number = 2) => {
+  const convertFromBase = (metric: string, toUnit: string, value: number, dp?: number) => {
     const baseUnit = builder.metrics.get(metric)?.baseUnit
     if (baseUnit == null)
       throw new Error(`Invalid metric of ${metric}(${unit})`)
@@ -154,6 +160,12 @@ export const MetricHandler = (function(){
   const getCode = function(metric: string, unit: string){
     return builder.metrics.get(metric)?.units.get(unit)?.code
   }
+
+  const getMetricAlias = function(metric: string){
+    if (!builder.metrics.has(metric))
+      throw new Error("Metric " + metric  + " does not exist")
+    return builder.metrics.get(metric)!.alias
+  }
   
   return {
     convertTo,
@@ -166,6 +178,7 @@ export const MetricHandler = (function(){
     getBaseUnit,
     convertToBase,
     convertFromBase,
-    getCode
+    getCode,
+    getMetricAlias
   }
 })()

@@ -107,6 +107,7 @@ export default class RecordSheet extends Component<Props> {
                       const input = CellInput(asRecord)
                       this.context.form?.addInput(input)
                       input.value = asRecord.getConvertedValue()
+                      console.log(asRecord.getConvertedValue())
 
                       return (old + 1) % 1_000_000
                     }, {})

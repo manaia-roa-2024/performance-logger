@@ -28,9 +28,11 @@ export default class LogCollection{
       collection.addLogGroup(LogGroup.Instance(lg, collection))
     }
 
-    //collection.logGroups = collection.logGroups.slice(0, 1)
+    
     
     collection.logGroups.sort(LogGroup.getSorter())
+
+    //collection.logGroups = collection.logGroups.slice(0, 1)
     return collection
   }
 

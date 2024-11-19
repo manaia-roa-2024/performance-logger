@@ -77,6 +77,8 @@ export default class CLogGroup extends QueryComponent<Props, State> {
 
     if (isError || !logRecords)
       return <p>There was an error loading your records</p>
+
+    console.log(this.props.logGroup)
     return (
       <LGProvider logGroup={this.props.logGroup}>
         <VertBox className="log-group black-border c-white">
