@@ -16,20 +16,26 @@ export default class Graphs extends Component{
 
     const dataPoints = logGroup.logRecords.map(lr =>{
       const date = new Date(lr.date)
+      const x = date
+      const y = Number(lr.getLineGraphValue())
+      const toolTipContent = `<span data-color="#6D78AD" style="color:rgb(109,120,173);">${SimpleDateInput.toISODate(date)}:</span>&nbsp;&nbsp;${lr.getConvertedValue()}`
       return {
-        x: date,
-        y: Number(lr.getConvertedValue()),
+        x,
+        y,
         label: SimpleDateInput.toISODate(date),
         indexLabel: undefined,
-        toolTipContent: undefined
+        toolTipContent: toolTipContent,
       }
     })
 
-    console.log(dataPoints)
+    //console.log(dataPoints)
 
     const CanvasJS = CanvasJSReact.CanvasJS;
     const CanvasJSChart = CanvasJSReact.CanvasJSChart;
 
+
+    /*color: rgb(109, 120, 173);*/
+    //#6D78AD
     const options = {
       theme: "light2",
       title: {
@@ -38,10 +44,16 @@ export default class Graphs extends Component{
       axisY: {
         title: logGroup.unit === 'unit' ? undefined : (`${MetricHandler.getMetricAlias(logGroup.metric)} (${MetricHandler.getCode(logGroup.metric, logGroup.unit)})`),
         labelFormatter: function(e){
-          console.log(e)
-          return e.value
+          return logGroup.convertGraphValue(e.value)
         }
       },
+      /*toolTip:{
+        contentFormatter: function(e){
+          const str = ""
+          console.log(e)
+          return 'abc'
+        }
+      },*/
       data: [{
           type: "line",
           xValueFormatString: "MMM YYYY",

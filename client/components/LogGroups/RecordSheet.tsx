@@ -17,8 +17,8 @@ import { SimpleNumberInput } from '../SimpleForm/Inputs/SimpleNumberInput'
 import { addLogRecord } from '../../apis/addLogRecord'
 import MutationComponent from '../MutationComponent'
 import { QueryClient, UseMutateFunction } from '@tanstack/react-query'
-import getDateSorter from '../../dateSorter'
 import CellInput from '../InputTemplates/CellInput'
+import SimpleTimeInput from '../SimpleForm/Inputs/SimpleTimeInput'
 
 interface Props {
   logRecords: LogRecord[]
@@ -41,12 +41,14 @@ export default class RecordSheet extends Component<Props> {
 
   addNewEntry(context: ILogGroupContext, mutate: UseMutateFunction<unknown, Error, ILogRecord, unknown>) {
     const lg = context.logGroup
-    const valueEntry = this.context.form?.getInput('value-entry') as SimpleNumberInput
+    const valueEntry = this.context.form?.getInput('value-entry') as SimpleNumberInput | SimpleTimeInput
 
     if (!valueEntry)
       return console.error("Value entry could not be found")
 
-    if (valueEntry.value == null || valueEntry.value === '' || !valueEntry.validNumReg.test(valueEntry.value)){
+    const validRgx: RegExp = (valueEntry instanceof SimpleNumberInput) ? valueEntry.validNumReg : valueEntry.validTimeReg
+
+    if (valueEntry.value == null || valueEntry.value === '' || !validRgx.test(valueEntry.value)){
       console.error("Invalid entry from the get go")
       return
     }
@@ -139,7 +141,7 @@ export default class RecordSheet extends Component<Props> {
           </Box>
         </VertBox>
         <VertBox className="record-lower thin-scrollbar">
-          {this.props.logRecords.map((logRecord, index) => {
+          {this.props.logRecords.map((logRecord) => {
             return <CLogRecord key={logRecord.id} logRecord={logRecord} />
           })}
         </VertBox>

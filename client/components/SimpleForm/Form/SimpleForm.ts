@@ -2,7 +2,7 @@ import SimpleInput from "../Inputs/SimpleInput"
 
 type BaseInput = SimpleInput<unknown>
 
-export type FormBuilder<T extends object> = (form: SimpleForm<T>) => void
+export type FormBuilder<T extends object, V=void> = (form: SimpleForm<T>, variables: V) => void
 
 export default class SimpleForm<T extends object>{
   rand: number

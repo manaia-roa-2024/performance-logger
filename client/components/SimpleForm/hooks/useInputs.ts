@@ -9,6 +9,7 @@ import SimpleEmailInput from "../Inputs/SimpleEmailInput"
 import SimpleCheckboxInput from "../Inputs/SimpleCheckboxInput"
 import SimpleDateInput from "../Inputs/SimpleDateInput"
 import PickOneDropdownInput from "../Inputs/PickOneDropdownInput"
+import SimpleTimeInput from "../Inputs/SimpleTimeInput"
 
 type Callback<T> = (inp: T) => void
 
@@ -73,4 +74,8 @@ export function useDateInput(id: string, callback?: Callback<SimpleDateInput>, s
 
 export function usePickOneDropdownInput(id: string, callback?: Callback<PickOneDropdownInput>, simpleOptions?: SimpleOptions){
   return useSimpleInput<PickOneDropdownInput>(id, PickOneDropdownInput, callback, simpleOptions)
+}
+
+export function useTimeInput(id: string, callback: Callback<SimpleTimeInput>, simpleOptions?: SimpleOptions){
+  return useSimpleInput<SimpleTimeInput>(id, SimpleTimeInput, callback, simpleOptions)
 }

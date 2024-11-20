@@ -3,6 +3,8 @@ const basic = (x: string, fn: (n: number) => number) =>{
     return x === '' || isNaN(n) ? null : fn(n) 
 }
 
+const timeReg = /(^\d+:\d+:\d+$)|(^\d+:\d+$)|(^\d+$)/
+
 const UnitConverters = {
   Identity: {
     toBase: (x: string) => basic(x, n => n),
@@ -23,6 +25,52 @@ const UnitConverters = {
   lb: {
     toBase: (x: string) => basic(x, n => n * 0.45359237),
     fromBase: (n: number) => (n / 0.45359237).toString()
+  },
+  duration: {
+    toBase: (x: string) =>{
+      const match = x.match(timeReg)
+      if (match == null) return null
+    
+      const parts = x.split(':').map(s => Number(s))
+    
+      let hh = 0
+      let mm = 0
+      let ss = 0
+    
+      switch (parts.length){
+        case 3:
+          hh = parts[0] ?? 0
+          mm = parts[1] ?? 0
+          ss = parts[2] ?? 0
+          break;
+        case 2:
+          mm = parts[0] ?? 0
+          ss = parts[1] ?? 0
+          break
+        case 1:
+          ss = parts[0] ?? 0
+      }
+      //console.log(hh, mm, ss)
+    
+      const seconds = ss + (60 * mm) + (3600 * hh)
+      return seconds
+    },
+    fromBase: (n: number) =>{
+      const hh = Math.floor(n / 3600)
+      const mm = Math.floor((n % 3600) / 60)
+      const ss = Math.round(n % 60)
+    
+      const zeroInFront = (n: number) =>{
+        return n < 10 ? ('0'+n) : ('' + n)
+      }
+    
+      console.log(hh, mm, ss)
+    
+      if (hh === 0){
+        return `${zeroInFront(mm)}:${zeroInFront(ss)}`
+      } else
+        return `${zeroInFront(hh)}:${zeroInFront(mm)}:${zeroInFront(ss)}`
+    }
   }
 }
 

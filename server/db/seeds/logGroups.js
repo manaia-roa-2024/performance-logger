@@ -39,6 +39,18 @@ const seedLogGroups = [
     metric: 'unit',
     unit: 'unit',
     created: rdt()
+  },
+  {
+    name: '5K Run',
+    metric: 'time',
+    unit: 'duration',
+    created: rdt()
+  },
+  {
+    name: 'Marathon',
+    metric: 'time',
+    unit: 'duration',
+    created: rdt()
   }
 ]
 
@@ -101,12 +113,40 @@ const seedRecords = (function(){
     const lg = seedLogGroups[2]
 
     recordDate.setDate(recordDate.getDate() + 1)
-    const prev = getPrev(records, 1)
+    const prev = getPrev(records, 3)
     records.push({
-      value: Math.round(Number(prev?.value ?? 10000) + (Math.random() * 4000 - 2000)),
+      value: Math.round(Number(prev?.value ?? 10000) + (Math.random() * 150 - 50)),
       date: Util.toISODate(recordDate),
       created: rdt(new Date(lg.created)),
       logGroupId: 3
+    })
+  }
+
+  recordDate = randomDateTime(new Date(2023, 11, 31), new Date(2024, 5, 30))
+  for (let i = 0; i < 56; i++){
+    const lg = seedLogGroups[3]
+
+    recordDate.setDate(recordDate.getDate() + 1)
+    const prev = getPrev(records, 4)
+    records.push({
+      value: Math.round(Number(prev?.value ?? 1260) + (Math.random() * 30 - 20)),
+      date: Util.toISODate(recordDate),
+      created: rdt(new Date(lg.created)),
+      logGroupId: 4
+    })
+  }
+
+  recordDate = randomDateTime(new Date(2023, 11, 31), new Date(2024, 5, 30))
+  for (let i = 0; i < 56; i++){
+    const lg = seedLogGroups[4]
+
+    recordDate.setDate(recordDate.getDate() + 1)
+    const prev = getPrev(records, 5)
+    records.push({
+      value: Math.round(Number(prev?.value ?? 10800) + (Math.random() * 120 - 90)),
+      date: Util.toISODate(recordDate),
+      created: rdt(new Date(lg.created)),
+      logGroupId: 5
     })
   }
 

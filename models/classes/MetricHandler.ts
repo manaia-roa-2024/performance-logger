@@ -1,4 +1,3 @@
-import { build } from "vite"
 import UnitConverters from "./BaseConverters"
 import roundToX from "../../client/roundToX"
 
@@ -70,12 +69,19 @@ export const MetricHandler = (function(){
   kg.converters.set('kg', UnitConverters.Identity.fromBase)
                .set('g', UnitConverters.g.fromBase)
                .set('lb', UnitConverters.lb.fromBase)
+  
+  const time = new Metric('s', 'Time')
+  const seconds = time.units.set('s', new BaseUnit(time, 'Seconds', 's'))
+                  .set('duration', new Unit(time, 'hh:mm:ss', 'hh:mm:ss', UnitConverters.duration.toBase))
+                  .get('s') as BaseUnit
+  seconds.converters.set('s', UnitConverters.Identity.fromBase)
+                    .set('duration', UnitConverters.duration.fromBase)
 
   const unit = new Metric('unit', 'Unit')
   const baseUnit = unit.units.set('unit', new BaseUnit(unit, 'Unit', 'units')).get('unit') as BaseUnit
   baseUnit.converters.set('unit', UnitConverters.Identity.fromBase)
 
-  builder.metrics.set('length', length).set('mass', mass).set('unit', unit)
+  builder.metrics.set('length', length).set('mass', mass).set('unit', unit).set('time', time)
   
   const convertTo = function(fromMetricCode: string, fromUnitCode: string, toMetricCode: string, toUnitCode: string, value: string, dp: number = 4){
 
@@ -106,12 +112,14 @@ export const MetricHandler = (function(){
   const convertToBase = (metric: string, unit: string, value: string) => {
     const baseUnit = builder.metrics.get(metric)?.baseUnit
     if (baseUnit == null)
-      throw new Error(`Invalid metric of ${metric}(${unit})`)
+      throw new Error(`Invalid metric of ${metric}`)
+    console.log(builder.metrics.get(metric))
 
-    const converted = builder.metrics.get(metric)?.units.get(unit)?.convertToBase(value)
-
-    if (converted == null)
+    if (!builder.metrics.get(metric)?.units.has(unit))
       throw new Error(`Invalid metric or unit of ${metric}(${unit})`)
+
+    const converted = builder.metrics.get(metric)!.units.get(unit)!.convertToBase(value)
+
     console.log(converted)
     return converted
     //return Number(convertTo(metric, unit, metric, baseUnit, value))

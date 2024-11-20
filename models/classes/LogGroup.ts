@@ -81,13 +81,15 @@ export default class LogGroup implements ILogGroup{
       records: 'N/A'
     }
 
+    const hideUnits = new Set(['unit', 'duration'])
+
     for (const key in preliminary){
       const value = preliminary[key]
       if (key === 'records' || value === 'N/A'){
         finalStats[key] = value.toString()
         continue
       }
-      finalStats[key] = MetricHandler.convertFromBase(this.metric, this.unit, value)! + ' ' + (this.metric === 'unit' ? '' : MetricHandler.getCode(this.metric, this.unit))
+      finalStats[key] = MetricHandler.convertFromBase(this.metric, this.unit, value)! + ' ' + (hideUnits.has(this.unit) ? '' : MetricHandler.getCode(this.metric, this.unit))
     }
     return finalStats
   }
@@ -116,6 +118,18 @@ export default class LogGroup implements ILogGroup{
       console.log("REMOVING ID NUMBER", id)
       this.logRecords.splice(index, 1)
     }
+  }
+
+  isDuration(){
+    return this.unit === 'duration'
+  }
+
+  convertGraphValue(graphValue: number): string | number | null{
+    switch (this.unit){
+      case 'duration':
+        return MetricHandler.convertFromBase(this.metric, this.unit, graphValue)
+    }
+    return graphValue
   }
 
   static Instance(json: ILogGroup, logCollection: LogCollection){

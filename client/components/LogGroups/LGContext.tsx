@@ -14,6 +14,7 @@ import MutationComponent from "../MutationComponent"
 import editLogGroup from "../../apis/editLogGroup"
 import { QueryClient } from "@tanstack/react-query"
 import LogCollection from "../../../models/classes/LogCollection"
+import SimpleTimeInput from "../SimpleForm/Inputs/SimpleTimeInput"
 
 export interface ILogGroupContext {
   logGroup: LogGroup,
@@ -32,15 +33,15 @@ export class LGProvider extends React.Component<Props>{
 
   context!: ContextType<typeof SimpleFormContext>
 
-  formBuilder: FormBuilder<object>
+  formBuilder: FormBuilder<object, LogGroup>
 
   logGroup: LogGroup
   
   constructor(props: Props){
     super(props)
     this.logGroup = props.logGroup
-    this.formBuilder = (form) => {
-      const logGroup = this.props.logGroup
+    this.formBuilder = (form, logGroup) => {
+      console.log("Building form")
       const nameInput = new SimpleTextInput('name')
       nameInput.useContainer = false
       nameInput.useInputBox = false
@@ -52,11 +53,18 @@ export class LGProvider extends React.Component<Props>{
       dateEntry.useInputBox = false
       dateEntry.useContainer = false
 
-      const valueEntry = new SimpleNumberInput('value-entry')
+      let valueEntry: SimpleNumberInput | SimpleTimeInput
+      if (logGroup.unit !== 'duration'){
+        valueEntry = new SimpleNumberInput('value-entry')
+        valueEntry.placeholder = 'New Entry'
+      } else{
+        valueEntry = new SimpleTimeInput('value-entry')
+        valueEntry.placeholder = 'hh:mm:ss'
+      }
+
       valueEntry.inputClass = 'entry-input entry-value'
       valueEntry.useInputBox = false
       valueEntry.useContainer = false
-      valueEntry.placeholder = 'New Entry'
 
       const metricDropdown = new PickOneDropdownInput('metric-dropdown')
       metricDropdown.label = 'Metric'
@@ -82,7 +90,7 @@ export class LGProvider extends React.Component<Props>{
       for (const logRecord of logGroup.logRecords) {
         form.addInput(CellInput(logRecord))
       }
-      this.updateCellValues(props.logGroup, form)
+      this.updateCellValues(logGroup, form)
 
       form.addInputs(nameInput, dateEntry, valueEntry, metricDropdown, unitDropdown)
     }
@@ -90,6 +98,7 @@ export class LGProvider extends React.Component<Props>{
 
   updateCellValues(logGroup: LogGroup, form: SimpleForm<object>){
     //console.log(logGroup)
+    console.log(logGroup.logRecords)
     for (const record of logGroup.logRecords){
       const input = form.getInput('record-input-' + record.id)!
       const newValue = MetricHandler.convertTo(logGroup.metric, MetricHandler.getBaseUnit(logGroup.metric)!, logGroup.metric, logGroup.unit, record.value.toString())
@@ -149,21 +158,34 @@ export class LGProvider extends React.Component<Props>{
     }
 
     return <LogGroupContext.Provider value={{reload: this.forceUpdate, logGroup: this.props.logGroup}}>
-      <SimpleFormContainer id={this.props.logGroup.formId()} formBuilder={this.formBuilder}>
+      <SimpleFormContainer id={this.props.logGroup.formId()} formBuilder={this.formBuilder} variables={this.props.logGroup}>
         {
           (form, buildForm) =>{
 
             const onSuccess = (result: ILogGroup, queryClient: QueryClient) =>{
               queryClient.setQueryData(['log-collection'], (old: LogCollection) =>{
+                const oldLogGroup = old.logGroups.find(x => x.id === result.id)
                 const newLogGroup = LogGroup.Instance(result, old)
-                old.updateGroup(newLogGroup)
+                old.logGroups = old.logGroups.map(lg =>{
+                  if (lg.id === result.id){
+                    newLogGroup.setRecords(lg.logRecords)
+                    return newLogGroup
+                  }
+                  return lg
+                })
                 const clone = LogCollection.Clone(old)
-                this.updateCellValues(newLogGroup, this.getForm())
+
+                console.log(oldLogGroup, newLogGroup)
+                if (newLogGroup.isDuration() != oldLogGroup?.isDuration())
+                  buildForm(newLogGroup)
+                else
+                  this.updateCellValues(newLogGroup, this.getForm())
+
                 return clone
               })
               //buildForm()
             }
-
+            //console.log(MetricHandler.convertToBase('time', 'duration', this.getForm().getInput('time-entry')!.value))
           return (
             <MutationComponent mutationFn={mutationFn} onSuccess={onSuccess}>
             {

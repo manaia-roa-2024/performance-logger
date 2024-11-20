@@ -36,6 +36,16 @@ export default class LogRecord implements ILogRecord{
     return MetricHandler.convertFromBase(this.logGroup!.metric, this.logGroup!.unit, this.value) || ''
   }
 
+  getLineGraphValue(): number{
+    const metric = this.logGroup!.metric
+    const unit = this.logGroup!.unit
+    switch (unit){
+      case 'duration':
+        return this.value
+    }
+    return Number(this.getConvertedValue())
+  }
+
   static Instance(json: ILogRecord, logGroup: LogGroup){
     const lr = new LogRecord(logGroup.id!)
 
