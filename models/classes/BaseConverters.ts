@@ -64,7 +64,7 @@ const UnitConverters = {
         return n < 10 ? ('0'+n) : ('' + n)
       }
     
-      console.log(hh, mm, ss)
+      //console.log(hh, mm, ss)
     
       if (hh === 0){
         return `${zeroInFront(mm)}:${zeroInFront(ss)}`

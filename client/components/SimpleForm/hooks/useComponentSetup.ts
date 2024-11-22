@@ -6,7 +6,7 @@ import useReload from "./useReload";
 
 export default function<T extends SimpleInput<unknown>>(props: InputProps<T>){
   const reload = useReload()
-  const form = useContext(SimpleFormInstanceContext)!.form
+  const form = useContext(SimpleFormInstanceContext).form
   let input: T
 
   if (typeof(props.input) === 'string'){

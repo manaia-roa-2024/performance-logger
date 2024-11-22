@@ -1,4 +1,4 @@
-import { Component, Context, ContextType, ReactNode } from "react"
+import { Component, ContextType, ReactNode } from "react"
 import CanvasJSReact from '@canvasjs/react-charts'
 import { LogGroupContext } from "../LGContext";
 import SimpleDateInput from "../../SimpleForm/Inputs/SimpleDateInput";
@@ -30,7 +30,7 @@ export default class Graphs extends Component{
 
     //console.log(dataPoints)
 
-    const CanvasJS = CanvasJSReact.CanvasJS;
+    //const CanvasJS = CanvasJSReact.CanvasJS;
     const CanvasJSChart = CanvasJSReact.CanvasJSChart;
 
 
@@ -43,7 +43,7 @@ export default class Graphs extends Component{
       },
       axisY: {
         title: logGroup.unit === 'unit' ? undefined : (`${MetricHandler.getMetricAlias(logGroup.metric)} (${MetricHandler.getCode(logGroup.metric, logGroup.unit)})`),
-        labelFormatter: function(e){
+        labelFormatter: function(e: {value: number}){
           return logGroup.convertGraphValue(e.value)
         }
       },

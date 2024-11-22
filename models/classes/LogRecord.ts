@@ -3,33 +3,44 @@ import LogGroup from "./LogGroup";
 import { MetricHandler } from "./MetricHandler";
 
 //nullable means db determined
-export interface ILogRecord{
-  id?: number
-  value: number,
-  date: string,
-  created?: string 
+export interface PartialLogRecord{
+  value: number
+  date: string
   logGroupId: number
+}
+
+export interface ILogRecord extends PartialLogRecord{
+  id: number
+  created: string 
 }
 
 export default class LogRecord implements ILogRecord{
   //db
-  id?: number
+  id: number
   value: number
   date: string
-  created?: string
+  created: string
   logGroupId: number
 
   //entities
-  logGroup?: LogGroup
+  logGroup: LogGroup
 
-  constructor(logGroupId: number){
-    this.id = undefined 
-    this.value = 0
-    this.date = '2024-11-03'
-    this.created = undefined
-    this.logGroupId = logGroupId
+  constructor(record: ILogRecord, group: LogGroup){
+    this.id = record.id 
+    this.value = record.value
+    this.date = record.date
+    this.created = record.created
+    this.logGroupId = record.logGroupId
 
-    this.logGroup = undefined
+    this.logGroup = group
+  }
+
+  update(record: ILogRecord){
+    this.id = record.id 
+    this.value = record.value
+    this.date = record.date
+    this.created = record.created
+    this.logGroupId = record.logGroupId
   }
 
   getConvertedValue(): string{
@@ -37,24 +48,13 @@ export default class LogRecord implements ILogRecord{
   }
 
   getLineGraphValue(): number{
-    const metric = this.logGroup!.metric
-    const unit = this.logGroup!.unit
+    //const metric = this.logGroup.metric
+    const unit = this.logGroup.unit
     switch (unit){
       case 'duration':
         return this.value
     }
     return Number(this.getConvertedValue())
-  }
-
-  static Instance(json: ILogRecord, logGroup: LogGroup){
-    const lr = new LogRecord(logGroup.id!)
-
-    lr.id = json.id
-    lr.value = json.value
-    lr.date = json.date
-    lr.logGroup = logGroup
-
-    return lr
   }
 
   static getSorter(order: Order = "desc"){

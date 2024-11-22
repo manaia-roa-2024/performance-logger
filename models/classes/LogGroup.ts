@@ -1,15 +1,16 @@
 import { Order } from "../Order";
-import LogCollection from "./LogCollection";
 import LogRecord, { ILogRecord } from "./LogRecord";
 import { MetricHandler } from "./MetricHandler";
 
-//nullable means db determined
-export interface ILogGroup{
-  id?: number
+export interface PartialLogGroup{
   name: string
-  created?: string
-  metric: string,
+  metric: string
   unit: string
+}
+
+export interface ILogGroup extends PartialLogGroup{
+  id: number
+  created: string
 }
 
 export interface RecordStats{
@@ -25,31 +26,55 @@ type AllString<T> = {
   [key in keyof T]: string
 }
 
+/*
+
+- Adding groups: create group from json, add to queryCache
+- Removing group: Remove from cache, remove form form
+- Updating group: update properties from json instead of creating new instance
+- Adding record: Create record from json, add to group, add new cellinput
+- Removing record: Remove record from group. Delete form input
+- Updating record: update properties from json instead of creating new instance
+*/
+
 export default class LogGroup implements ILogGroup{
   //db
-  id?: number
+  id: number
   name: string
   metric: string;
   unit: string
-  created?: string
-
-  arand: number
+  created: string
 
   // entities
   logRecords: LogRecord[]
-  logCollection?: LogCollection
 
-  constructor(){
-    this.id = undefined
-    this.name = 'New Performance Log'
-    this.metric = ''
-    this.unit = ''
-    this.created = undefined
-
+  constructor(json: ILogGroup){
+    this.id = json.id
+    this.name =  json.name
+    this.metric = json.metric
+    this.unit = json.unit
+    this.created = json.created
+    
     this.logRecords = []
-    this.logCollection = undefined
+  }
 
-    this.arand = Math.random()
+  update(json: ILogGroup){
+    this.id = json.id
+    this.name =  json.name
+    this.metric = json.metric
+    this.unit = json.unit
+    this.created = json.created
+  }
+
+  addJsonRecord(json: ILogRecord){
+    const instance = new LogRecord(json, this)
+    this.logRecords.push(instance)
+    return instance
+  }
+
+  addJsonRecords(json: Array<ILogRecord>){
+    json.forEach(record =>{
+      this.addJsonRecord(record)
+    })
   }
 
   getAnalytics(): AllString<RecordStats>{
@@ -98,28 +123,6 @@ export default class LogGroup implements ILogGroup{
     return 'record-sheet-' + this.id
   }
 
-  setRecords(records: Array<LogRecord>){
-    this.logRecords = records
-    for (const rec of records){
-      rec.logGroup = this
-    }
-  }
-
-  addRecordFromJson(record: ILogRecord){
-    const instance = LogRecord.Instance(record, this)
-    this.logRecords.push(instance)
-    this.logRecords.sort(LogRecord.getSorter())
-    return instance
-  }
-
-  removeById(id: number){
-    const index = this.logRecords.findIndex(x => x.id === id)
-    if (index >= 0){
-      console.log("REMOVING ID NUMBER", id)
-      this.logRecords.splice(index, 1)
-    }
-  }
-
   isDuration(){
     return this.unit === 'duration'
   }
@@ -132,17 +135,8 @@ export default class LogGroup implements ILogGroup{
     return graphValue
   }
 
-  static Instance(json: ILogGroup, logCollection: LogCollection){
-    const lg = new LogGroup()
-    
-    lg.id = json.id
-    lg.name = json.name
-    lg.logCollection = logCollection
-    lg.metric = json.metric
-    lg.unit = json.unit
-    lg.created = json.created
-
-    return lg
+  sortRecords(){
+    return this.logRecords.sort(LogRecord.getSorter())
   }
 
   static getSorter(order: Order = "desc"){

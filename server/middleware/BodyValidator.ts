@@ -1,10 +1,11 @@
 import { RequestHandler } from "express";
-import { ILogGroup } from "../../models/classes/LogGroup";
+import { PartialLogGroup } from "../../models/classes/LogGroup";
 import ProblemDetails from "../ProblemDetails";
 import { MetricHandler } from "../../models/classes/MetricHandler";
 import Util from "../Util";
-import { ILogRecord } from "../../models/classes/LogRecord";
+import { PartialLogRecord } from "../../models/classes/LogRecord";
 import Dict from "../../models/Dict";
+import Optional from "../../models/Optional";
 
 /*type Optional<T> ={
   [prop in keyof T]?: T[prop]
@@ -33,7 +34,7 @@ function cna(dto: Record<string, unknown>, ...propertyNames: Array<string>){ //c
 }
 
 const LogGroup: RequestHandler = function(req, res, next){
-  const dto = req.body as ToDict<ILogGroup>
+  const dto = req.body as ToDict<PartialLogGroup>
 
   if (!dto || typeof(dto) !== 'object')
     throw ProblemDetails.UserError('Expected an object')
@@ -73,7 +74,7 @@ function createMutateObj(mutateSet: Set<string>, obj: Dict){
 }
 
 const EditLogGroup: RequestHandler = function(req, res, next){
-  const dto = req.body as ToDict<ILogGroup>
+  const dto = req.body as ToDict<Optional<PartialLogGroup>>
 
   if (!dto || typeof(dto) !== 'object')
     throw ProblemDetails.UserError('Expected an object')
@@ -81,7 +82,7 @@ const EditLogGroup: RequestHandler = function(req, res, next){
   if (dto.metric != null && !MetricHandler.hasMetric(dto.metric))
     throw ProblemDetails.PropertyError('metric', `Invalid metric of '${dto.metric}'`)
 
-  if (dto.unit != null && !MetricHandler.hasUnit(dto.metric, dto.unit))
+  if (dto.unit != null && !MetricHandler.hasUnit(dto.metric!, dto.unit))
     throw ProblemDetails.PropertyError(dto.unit, `Invalid unit of '${dto.unit}'`)
 
   if (dto.name != null){
@@ -97,7 +98,7 @@ const EditLogGroup: RequestHandler = function(req, res, next){
 }
 
 const LogRecord: RequestHandler = function (req, res, next){
-  const dto = req.body as ToDict<ILogRecord>
+  const dto = req.body as ToDict<PartialLogRecord>
   console.log(dto)
 
   if (!dto || typeof(dto) !== 'object')

@@ -1,6 +1,6 @@
 import { Component, ReactNode } from 'react'
-import LogRecord, { ILogRecord } from '../../../models/classes/LogRecord'
-import { SimpleFormInstanceContext } from '../SimpleForm/Form/SimpleFormInstance'
+import LogRecord, { ILogRecord, PartialLogRecord } from '../../../models/classes/LogRecord'
+import { ISimpleFormInstanceContext, SimpleFormInstanceContext } from '../SimpleForm/Form/SimpleFormInstance'
 import { Box, VertBox } from '../Box'
 import SimpleDateInput from '../SimpleForm/Inputs/SimpleDateInput'
 import CDateInput from '../SimpleForm/Components/CDateInput'
@@ -16,9 +16,11 @@ import { MetricHandler } from '../../../models/classes/MetricHandler'
 import { SimpleNumberInput } from '../SimpleForm/Inputs/SimpleNumberInput'
 import { addLogRecord } from '../../apis/addLogRecord'
 import MutationComponent from '../MutationComponent'
-import { QueryClient, UseMutateFunction } from '@tanstack/react-query'
-import CellInput from '../InputTemplates/CellInput'
+import { UseMutateFunction } from '@tanstack/react-query'
 import SimpleTimeInput from '../SimpleForm/Inputs/SimpleTimeInput'
+import SimpleForm from '../SimpleForm/Form/SimpleForm'
+import LogGroup from '../../../models/classes/LogGroup'
+
 
 interface Props {
   logRecords: LogRecord[]
@@ -26,8 +28,7 @@ interface Props {
 
 export default class RecordSheet extends Component<Props> {
   static contextType = SimpleFormInstanceContext
-
-  context!: React.ContextType<typeof SimpleFormInstanceContext>
+  context!: ISimpleFormInstanceContext<SimpleForm<object>, LogGroup>
 
   incrementEntryDate(incrementer: number) {
     if (!this.context.form) return
@@ -39,7 +40,7 @@ export default class RecordSheet extends Component<Props> {
     dateInput.updateValue(SimpleDateInput.toISODate(asDate))
   }
 
-  addNewEntry(context: ILogGroupContext, mutate: UseMutateFunction<unknown, Error, ILogRecord, unknown>) {
+  addNewEntry(context: ILogGroupContext, mutate: UseMutateFunction<unknown, Error, PartialLogRecord, unknown>) {
     const lg = context.logGroup
     const valueEntry = this.context.form?.getInput('value-entry') as SimpleNumberInput | SimpleTimeInput
 
@@ -100,19 +101,10 @@ export default class RecordSheet extends Component<Props> {
               <LogGroupContext.Consumer>
                 {(context: ILogGroupContext) => {
 
-                  const mutationFn = (newRecord: ILogRecord) => addLogRecord(newRecord)
+                  const mutationFn = (newRecord: PartialLogRecord) => addLogRecord(newRecord)
 
-                  const onSuccess = (result: ILogRecord, queryClient: QueryClient) =>{
-                    queryClient.setQueryData(['records', context.logGroup.id!.toString()], (old: number) =>{
-                      const asRecord = context.logGroup.addRecordFromJson(result)
-
-                      const input = CellInput(asRecord)
-                      this.context.form?.addInput(input)
-                      input.value = asRecord.getConvertedValue()
-                      console.log(asRecord.getConvertedValue())
-
-                      return (old + 1) % 1_000_000
-                    }, {})
+                  const onSuccess = (result: ILogRecord) =>{
+                    context.addNewLogRecord(result)
 
                     this.incrementEntryDate(1)
                     this.getValueEntry().updateValue('')
@@ -157,11 +149,7 @@ class Caret extends Component<{
 }> {
   render() {
     return (
-      <div
-        className="simple-center caret-box cp"
-        title={this.props.title}
-        onClick={this.props.onClick}
-      >
+      <div className="simple-center caret-box cp" title={this.props.title} onClick={this.props.onClick}>
         <FontAwesomeIcon
           fontSize={'25px'}
           icon={this.props.left ? faCaretLeft : faCaretRight}

@@ -1,5 +1,5 @@
-import { ILogGroup } from '../../models/classes/LogGroup.ts'
-import { ILogRecord } from '../../models/classes/LogRecord.ts'
+import { ILogGroup, PartialLogGroup } from '../../models/classes/LogGroup.ts'
+import { ILogRecord, PartialLogRecord } from '../../models/classes/LogRecord.ts'
 import connection from './connection.ts'
 import Util from '../Util.ts'
 import Optional from '../../models/Optional.ts'
@@ -16,26 +16,19 @@ export async function getAllRecords(logGroupId: number){
   return result
 }
 
-export async function addGroup(group: ILogGroup){
-  const toAdd: ILogGroup = {
-    name: group.name,
-    metric: group.metric,
-    unit: group.unit,
-    created: Util.createTimeStamp()
-  }
-
+export async function addGroup(group: PartialLogGroup){
   const result = await connection('logGroup')
     .insert({
       name: group.name,
       metric: group.metric,
       unit: group.unit,
       created: Util.createTimeStamp()
-    })
-  toAdd.id = result[0]
-  return toAdd
+    }, '*') as ILogGroup[]
+
+  return result[0]
 }
 
-export async function editGroup(group: Optional<ILogGroup>, id: number){
+export async function editGroup(group: Optional<PartialLogGroup>, id: number){
   const result = await connection('logGroup')
     .update({...group}, '*')
     .where({id}) as ILogGroup[]
@@ -49,7 +42,7 @@ export async function deleteGroup(id: number){
     .where({id}).delete()
 }
 
-export async function addRecord(record: ILogRecord){
+export async function addRecord(record: PartialLogRecord){
   const result = await connection<ILogRecord>('logRecord')
     .insert({
       value: record.value,

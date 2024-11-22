@@ -1,18 +1,19 @@
 import { QueryFunction, useQuery, UseQueryResult } from "@tanstack/react-query";
-import { Component, ReactNode, useRef } from "react";
+import { ReactNode, useRef } from "react";
 
-interface QueryProps{
+interface QueryProps<T>{
   queryKey: string[]
-  queryFn: QueryFunction
+  queryFn: QueryFunction<T>
+  children: (result: UseQueryResult<T>) => ReactNode
 }
 
-function Query(props: QueryProps & {children: (result: UseQueryResult) => ReactNode}) {
+export default function QueryComponent<T=unknown>(props: QueryProps<T>) {
   const hasRunOnce = useRef(false)
-  const query = useQuery({queryKey: props.queryKey, queryFn: props.queryFn, enabled: !hasRunOnce.current})
+  const query = useQuery<T>({queryKey: props.queryKey, queryFn: props.queryFn, enabled: !hasRunOnce.current, structuralSharing: false})
   hasRunOnce.current = true
   return props.children(query);
 }
-
+/*
 export default class QueryComponent<P=object, S=object, SS=object> extends Component<P, S, SS>{
 
   queryKey: string[]

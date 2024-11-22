@@ -5,8 +5,7 @@ import LogGroup, { ILogGroup } from "../../../models/classes/LogGroup";
 import MutationComponent from "../MutationComponent";
 import editLogGroup from "../../apis/editLogGroup";
 import SimpleTextInput from "../SimpleForm/Inputs/SimpleTextInput";
-import { QueryClient } from "@tanstack/react-query";
-import LogCollection from "../../../models/classes/LogCollection";
+import { LogGroupContext } from "./LGContext";
 
 interface Props{
   onBlur: () => void,
@@ -23,12 +22,12 @@ export default class NameEditor extends Component<Props>{
   }
 
   getNameInput(){
-    return this.context.form!.getInput('name')! as SimpleTextInput
+    return this.context.form.getInput('name')! as SimpleTextInput
   }
 
   componentDidMount(): void {
     const inputElement = document.getElementById(this.getNameInput().elementId)! as HTMLInputElement
-    inputElement.focus()
+    inputElement.select()
   }
 
   render(): ReactNode {
@@ -37,39 +36,32 @@ export default class NameEditor extends Component<Props>{
       name: this.getNameInput().getFormattedValue()
     }, this.props.logGroup.id!)
 
-    const onSuccess = (result: ILogGroup, queryClient: QueryClient) => {
-      queryClient.setQueryData(['log-collection'], (old: LogCollection) =>{
-        const replaceIndex = old.logGroups.findIndex(lg => lg.id === result.id)
-        const oldGroup = old.logGroups[replaceIndex]
-        old.logGroups[replaceIndex] = LogGroup.Instance(result, old)
-        old.logGroups[replaceIndex].setRecords(oldGroup.logRecords)
-        return LogCollection.Clone(old)
-      })
-    }
+    return <LogGroupContext.Consumer>
+      {(context) =>{
 
-    const onSettled = (result: ILogGroup | undefined) =>{
-      if (!result)
-        this.getNameInput().updateValue(this.props.logGroup.name)
-      else{
-        this.getNameInput().updateValue(result.name)
-      }
-      this.props.onBlur()
-    }
-
-    return <MutationComponent mutationFn={mutationFn} onSuccess={onSuccess} onSettled={onSettled}>
-      {({mutate}) =>{
-
-        const keyDown = (e: KeyboardEvent<HTMLInputElement>) =>{
-          if (e.key === 'Enter')
-            mutate()
+        const onSettled = (result: ILogGroup | undefined) =>{
+          if (!result)
+            this.getNameInput().updateValue(this.props.logGroup.name)
+          else{
+            context.updateExistingGroup(result)
+          }
+          this.props.onBlur()
         }
 
+        return <MutationComponent mutationFn={mutationFn} onSettled={onSettled}>
+          {({mutate}) =>{
 
-        return <CTextInput input="name" onClick={e => e.stopPropagation()} onBlur={() => mutate()} onKeyDown={keyDown}
-          inputClass='edit-title-input group-title-box fg1 bold'/>
-        }
-      }
-    </MutationComponent>
+            const keyDown = (e: KeyboardEvent<HTMLInputElement>) =>{
+              if (e.key === 'Enter')
+                mutate()
+            }
+            return <CTextInput input="name" onClick={e => e.stopPropagation()} onBlur={() => mutate()} onKeyDown={keyDown}
+              inputClass='edit-title-input group-title-box fg1 bold'/>
+            }
+          }
+      </MutationComponent>
+      }}
+    </LogGroupContext.Consumer>
 
   }
 }

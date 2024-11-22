@@ -40,7 +40,7 @@ router.post('/logrecord', BodyValidator.LogRecord, async (req, res) =>{
 })
 
 router.delete('/logrecord/:id', async (req, res) =>{
-  const result = await connection('logRecord')
+  await connection('logRecord')
     .where({id: req.params.id})
     .delete()
   

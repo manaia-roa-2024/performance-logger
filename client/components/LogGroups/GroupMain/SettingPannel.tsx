@@ -5,9 +5,7 @@ import { faTrash } from "@fortawesome/free-solid-svg-icons";
 import { GenericPopup } from "../../Popup";
 import { LogGroupContext } from "../LGContext";
 import MutationComponent from "../../MutationComponent";
-import { QueryClient } from "@tanstack/react-query";
 import deleteLogGroup from "../../../apis/deleteLogGroup";
-import LogCollection from "../../../../models/classes/LogCollection";
 
 export default class SettingPannel extends Component{
   render(): ReactNode {
@@ -43,14 +41,11 @@ class DeleteGroupButton extends Component{
       return deleteLogGroup(this.context.logGroup.id!)
     }
 
-    const onSuccess = (result: undefined, queryClient: QueryClient) =>{
-      queryClient.setQueryData(['log-collection'], (old: LogCollection) =>{
-        old.logGroups = old.logGroups.filter(lg => lg.id != this.context.logGroup.id)
-        return LogCollection.Clone(old)
-      })
+    const onSuccess = () =>{
+      this.context.deleteExistingGroup()
     }
 
-    const onSettled = (result: undefined, queryClient: QueryClient) =>{
+    const onSettled = () =>{
       const popup = document.getElementById(popupId) as HTMLDialogElement
       popup.close()
     }

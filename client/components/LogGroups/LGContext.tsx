@@ -3,30 +3,36 @@ import LogGroup, { ILogGroup } from "../../../models/classes/LogGroup"
 import { ReactNode } from "react"
 import SimpleForm, { FormBuilder } from "../SimpleForm/Form/SimpleForm"
 import SimpleDateInput from "../SimpleForm/Inputs/SimpleDateInput"
-import { SimpleNumberInput } from "../SimpleForm/Inputs/SimpleNumberInput"
 import CellInput from "../InputTemplates/CellInput"
-import SimpleFormContainer, { SimpleFormConsumer } from "../SimpleForm/Form/SimpleFormContainer"
+import SimpleFormContainer from "../SimpleForm/Form/SimpleFormContainer"
 import SimpleTextInput from "../SimpleForm/Inputs/SimpleTextInput"
 import { SimpleFormContext } from "../SimpleForm/Form/SimpleFormProvider"
 import PickOneDropdownInput from "../SimpleForm/Inputs/PickOneDropdownInput"
 import { MetricHandler } from "../../../models/classes/MetricHandler"
 import MutationComponent from "../MutationComponent"
 import editLogGroup from "../../apis/editLogGroup"
-import { QueryClient } from "@tanstack/react-query"
-import LogCollection from "../../../models/classes/LogCollection"
-import SimpleTimeInput from "../SimpleForm/Inputs/SimpleTimeInput"
+import QCC from "../QCC"
+import LogRecord, { ILogRecord } from "../../../models/classes/LogRecord"
+import { NumberEntry, TimeEntry } from "../InputTemplates/Entries"
 
 export interface ILogGroupContext {
   logGroup: LogGroup,
-  reload: () => void
+  reload: () => void,
+
+  deleteExistingGroup: () => void,
+  updateExistingGroup: (json: ILogGroup) => void,
+
+  addNewLogRecord: (json: ILogRecord) => void,
+  updateExistingLogRecord: (json: ILogRecord) => void,
+  deleteExistingLogRecord: (id: number) => void
 }
 
-type Props = {children?: ReactNode, logGroup: LogGroup}
+type Props = {
+  children?: ReactNode, 
+  logGroup: LogGroup
+}
 
-export const LogGroupContext = React.createContext<ILogGroupContext>({
-  reload: () => {},
-  logGroup: new LogGroup()
-})
+export const LogGroupContext = React.createContext<ILogGroupContext>({} as unknown as ILogGroupContext)
 
 export class LGProvider extends React.Component<Props>{
   static contextType = SimpleFormContext
@@ -41,7 +47,6 @@ export class LGProvider extends React.Component<Props>{
     super(props)
     this.logGroup = props.logGroup
     this.formBuilder = (form, logGroup) => {
-      console.log("Building form")
       const nameInput = new SimpleTextInput('name')
       nameInput.useContainer = false
       nameInput.useInputBox = false
@@ -53,18 +58,7 @@ export class LGProvider extends React.Component<Props>{
       dateEntry.useInputBox = false
       dateEntry.useContainer = false
 
-      let valueEntry: SimpleNumberInput | SimpleTimeInput
-      if (logGroup.unit !== 'duration'){
-        valueEntry = new SimpleNumberInput('value-entry')
-        valueEntry.placeholder = 'New Entry'
-      } else{
-        valueEntry = new SimpleTimeInput('value-entry')
-        valueEntry.placeholder = 'hh:mm:ss'
-      }
-
-      valueEntry.inputClass = 'entry-input entry-value'
-      valueEntry.useInputBox = false
-      valueEntry.useContainer = false
+      const valueEntry = logGroup.isDuration() ? TimeEntry() : NumberEntry()
 
       const metricDropdown = new PickOneDropdownInput('metric-dropdown')
       metricDropdown.label = 'Metric'
@@ -96,25 +90,32 @@ export class LGProvider extends React.Component<Props>{
     }
   }
 
-  updateCellValues(logGroup: LogGroup, form: SimpleForm<object>){
-    //console.log(logGroup)
-    console.log(logGroup.logRecords)
+  updateCellValues(logGroup: LogGroup, form?: SimpleForm<object>){
     for (const record of logGroup.logRecords){
-      const input = form.getInput('record-input-' + record.id)!
-      const newValue = MetricHandler.convertTo(logGroup.metric, MetricHandler.getBaseUnit(logGroup.metric)!, logGroup.metric, logGroup.unit, record.value.toString())
-      if (newValue == null)
-        return console.error("Conversion fail")
-      input.value = newValue.toString()
+      this.updateCellValue(record, form ?? this.getForm())
     }
   }
 
+  updateCellValue(record: LogRecord, form?: SimpleForm<object>){
+    form = form ?? this.getForm()
+    const input = form.getInput('record-input-' + record.id)!
+    const newValue = MetricHandler.convertTo(this.logGroup.metric, MetricHandler.getBaseUnit(this.logGroup.metric)!, this.logGroup.metric, this.logGroup.unit, record.value.toString())
+    if (newValue == null)
+      return console.error("Conversion fail")
+    input.value = newValue.toString()
+  }
+
+  resetForm(logGroup: LogGroup){
+    logGroup = logGroup ?? this.logGroup
+    this.context.getBuilder(this.logGroup.formId())?.apply(null, [logGroup])
+  }
 
   componentWillUnmount(): void {
-    this.context?.removeForm(this.props.logGroup.formId())
+    this.context.removeForm(this.logGroup.formId())
   }
 
   getForm(){
-    return this.context!.getForm(this.props.logGroup.formId())! as SimpleForm<object>
+    return this.context.getForm(this.logGroup.formId())! as SimpleForm<object>
   }
 
   getMetricDropdown(){
@@ -133,91 +134,121 @@ export class LGProvider extends React.Component<Props>{
     return this.getUnitDropdown().getSelectedOption()?.key
   }
 
-
-  /*shouldComponentUpdate(nextProps: Readonly<Props>, nextState: Readonly<{}>, nextContext: any): boolean {
-    if (this.props.logGroup.unit !== nextProps.logGroup.unit){
-      console.log("Component should update")
-      return true
-    }
-    return false
-  }
-
-  componentDidUpdate(prevProps: Readonly<Props>, prevState: Readonly<{}>, snapshot?: any): void {
-    if (prevProps.logGroup !== this.props.logGroup){
-
-    }
-  }*/
-
   render(): ReactNode {
 
-    const mutationFn = () => {
-      return editLogGroup({
-        metric: this.dropdownMetric(),
-        unit: this.dropdownUnit()
-      }, this.props.logGroup.id!)
-    }
+    return (
+      <QCC>
+        {(queryClient) => {
 
-    return <LogGroupContext.Provider value={{reload: this.forceUpdate, logGroup: this.props.logGroup}}>
-      <SimpleFormContainer id={this.props.logGroup.formId()} formBuilder={this.formBuilder} variables={this.props.logGroup}>
-        {
-          (form, buildForm) =>{
-
-            const onSuccess = (result: ILogGroup, queryClient: QueryClient) =>{
-              queryClient.setQueryData(['log-collection'], (old: LogCollection) =>{
-                const oldLogGroup = old.logGroups.find(x => x.id === result.id)
-                const newLogGroup = LogGroup.Instance(result, old)
-                old.logGroups = old.logGroups.map(lg =>{
-                  if (lg.id === result.id){
-                    newLogGroup.setRecords(lg.logRecords)
-                    return newLogGroup
-                  }
-                  return lg
-                })
-                const clone = LogCollection.Clone(old)
-
-                console.log(oldLogGroup, newLogGroup)
-                if (newLogGroup.isDuration() != oldLogGroup?.isDuration())
-                  buildForm(newLogGroup)
-                else
-                  this.updateCellValues(newLogGroup, this.getForm())
-
-                return clone
-              })
-              //buildForm()
-            }
-            //console.log(MetricHandler.convertToBase('time', 'duration', this.getForm().getInput('time-entry')!.value))
-          return (
-            <MutationComponent mutationFn={mutationFn} onSuccess={onSuccess}>
-            {
-              ({mutate}) =>{
-                const md = this.getMetricDropdown()
-                const ud = this.getUnitDropdown()
-                md.updateValue = (newValue: number) =>{
-                  md.value = newValue
-                  const met = md.getSelectedOption()!.key
-                  let base = 0
-                  ud.options = MetricHandler.getUnits(met).map(([key, unit], i) =>{
-                    if (key === MetricHandler.getBaseUnit(met))
-                      base = i
-                    return {key, value: unit.alias}
-                  })
-                  ud.updateValue(base)
-                }
-
-                ud.updateValue = (newValue: number) =>{
-                  ud.value = newValue
-                  mutate()
-                  ud.reload()
-                }
-
-                return this.props.children
-              }
-            }
-            </MutationComponent>)
+          const deleteExistingGroup = () =>{
+            const id = this.logGroup.id
+            queryClient.setQueryData(['all-log-groups'], (old: Array<LogGroup>) =>{
+              return old.filter(lg => lg.id !== id)
+            })
           }
-        }
-        
-      </SimpleFormContainer>
-    </LogGroupContext.Provider>
+
+          const updateExistingGroup = (json: ILogGroup) =>{
+            queryClient.setQueryData(['all-log-groups'], (old: Array<LogGroup>) =>{
+              const mapped = old.map(lg =>{
+                if (lg.id === json.id){
+                  lg.update(json)
+                  this.resetForm(lg)
+                }
+                return lg
+              })
+              return mapped
+            })
+          }
+
+          const addNewLogRecord = (json: ILogRecord) =>{
+            queryClient.setQueryData(['records', this.props.logGroup.id.toString()], (old: number) =>{
+              const newRecord = this.logGroup.addJsonRecord(json)
+              this.logGroup.sortRecords()
+              const input = CellInput(newRecord)
+              this.getForm().addInput(input)
+              this.updateCellValue(newRecord)
+              return old + 1 % 1_000_000
+            })
+          }
+
+          const updateExistingLogRecord = (json: ILogRecord) =>{
+            queryClient.setQueryData(['records', this.props.logGroup.id.toString()], (old: number) =>{
+              for (const record of this.logGroup.logRecords){
+                if (record.id === json.id){
+                  record.update(json)
+                  this.updateCellValue(record)
+                }
+              }
+              return old + 1 % 1_000_000
+            })
+          }
+
+          const deleteExistingLogRecord = (id: number) =>{
+            queryClient.setQueryData(['records', this.props.logGroup.id.toString()], (old: number) =>{
+              const recordIndex = this.logGroup.logRecords.findIndex(r => r.id===id)
+              const deletedRecord = this.logGroup.logRecords[recordIndex]
+              if (recordIndex < 0)
+                throw new Error('Could not find record')
+              this.getForm().removeInput('record-input-' + deletedRecord.id)
+              this.logGroup.logRecords.splice(recordIndex, 1)
+              return old + 1 % 1_000_000
+            })
+          }
+          return <LogGroupContext.Provider value={{reload: this.forceUpdate, logGroup: this.props.logGroup, deleteExistingGroup, 
+          updateExistingGroup, addNewLogRecord, updateExistingLogRecord, deleteExistingLogRecord}}>
+            
+            <SimpleFormContainer id={this.props.logGroup.formId()} formBuilder={this.formBuilder} variables={this.props.logGroup}>
+              {
+                () =>{
+      
+                  const onSuccess = (result: ILogGroup) =>{
+                    updateExistingGroup(result)
+                  }
+
+                  const mutationFn = () => {
+                    return editLogGroup({
+                      metric: this.dropdownMetric(),
+                      unit: this.dropdownUnit()
+                    }, this.logGroup.id)
+                  }
+
+                return (
+
+                  <MutationComponent mutationFn={mutationFn} onSuccess={onSuccess}>
+                  {
+                    ({mutate}) =>{
+                      const md = this.getMetricDropdown()
+                      const ud = this.getUnitDropdown()
+                      md.updateValue = (newValue: number) =>{
+                        md.value = newValue
+                        const met = md.getSelectedOption()!.key
+                        let base = 0
+                        ud.options = MetricHandler.getUnits(met).map(([key, unit], i) =>{
+                          if (key === MetricHandler.getBaseUnit(met))
+                            base = i
+                          return {key, value: unit.alias}
+                        })
+                        ud.updateValue(base)
+                      }
+      
+                      ud.updateValue = (newValue: number) =>{
+                        ud.value = newValue
+                        mutate()
+                        ud.reload()
+                      }
+      
+                      return this.props.children
+                    }
+                  }
+                  </MutationComponent>)
+                }
+              }
+              
+            </SimpleFormContainer>
+          </LogGroupContext.Provider>
+        }}
+      
+    </QCC>
+    )
   }
 }

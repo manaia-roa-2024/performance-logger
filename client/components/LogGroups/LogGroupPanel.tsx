@@ -1,32 +1,35 @@
-import {ReactNode } from 'react'
+import {Component, ReactNode } from 'react'
 import QueryComponent from '../QueryComponent'
-import { UseQueryResult } from '@tanstack/react-query'
 import { VertBox } from '../Box'
-import LogCollection from '../../../models/classes/LogCollection'
 import getLogCollection from '../../apis/getLogCollection'
 import CLogGroup from './CLogGroup'
-import FormLogger from '../FormLogger'
 
-export default class LogGroupPanel extends QueryComponent {
+export default class LogGroupPanel extends Component{
   constructor(props: object) {
-    super(props, ['log-collection'], getLogCollection)
+    super(props)
   }
 
-  renderQuery({
-    data,
-    isPending,
-    isError,
-  }: UseQueryResult<LogCollection>): ReactNode {
-    if (isPending) return <p>Pending...</p>
-
-    if (isError || !data) return <p>There was an error loading your records</p>
+  render(): ReactNode {
     return (
-      <VertBox gap="40px">
-        {data.logGroups.map((group, index) => {
-          return <CLogGroup key={group.id} logGroup={group} />
-        })}
-        {/*<FormLogger/>*/}
-      </VertBox>
+      <QueryComponent queryKey={['all-log-groups']} queryFn={getLogCollection}>
+        {
+          ({data: logGroups, isPending, isError}) =>{
+            
+            if (isPending) return <p>Pending...</p>
+
+            if (isError || !logGroups) return <p>There was an error loading your records</p>
+
+            return <VertBox gap="40px">
+              {logGroups.map((group) => {
+                return <CLogGroup key={group.id} logGroup={group} />
+              })}
+              {/*<FormLogger/>*/}
+            </VertBox>
+          }
+          
+        }
+      </QueryComponent>
+      
     )
   }
 }

@@ -5,12 +5,12 @@ import useReload from "../hooks/useReload";
 
 export type BuildForm<T, V> = (variables?: V) => T
 
-export default function useSimpleForm<T extends object, V=void>(id: string, callback: FormBuilder<T, V> | undefined, callbackVar?: V){
+export default function useSimpleForm<T extends object, V=void>(id: string, callback?: FormBuilder<T, V>, callbackVar?: V){
   const reload = useReload()
   const context = React.useContext(SimpleFormContext)!
 
   const buildForm: BuildForm<SimpleForm<T>, V> = (variables?: V) =>{
-    const existingForm = context.forms.get(id)
+    const existingForm = context.getForm(id)
     if (!callback && existingForm) return existingForm as SimpleForm<T>
     else if (!callback)
       throw new Error("Cannot call buildform for a form that does not exist")
@@ -21,7 +21,8 @@ export default function useSimpleForm<T extends object, V=void>(id: string, call
 
     callback(form, variables!)
 
-    context.addForm(form)
+    const bf = buildForm as BuildForm<SimpleForm<object>, unknown>
+    context.addForm({form, buildForm: bf})
 
     return form
   }
