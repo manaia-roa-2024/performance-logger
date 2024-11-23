@@ -99,7 +99,7 @@ export class LGProvider extends React.Component<Props>{
   updateCellValue(record: LogRecord, form?: SimpleForm<object>){
     form = form ?? this.getForm()
     const input = form.getInput('record-input-' + record.id)!
-    const newValue = MetricHandler.convertTo(this.logGroup.metric, MetricHandler.getBaseUnit(this.logGroup.metric)!, this.logGroup.metric, this.logGroup.unit, record.value.toString())
+    const newValue = record.getConvertedValue()
     if (newValue == null)
       return console.error("Conversion fail")
     input.value = newValue.toString()

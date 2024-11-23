@@ -58,6 +58,7 @@ const LogGroup: RequestHandler = function(req, res, next){
 }
 
 const mutableGroupProperties = new Set(['name', 'metric', 'unit'])
+const mutableRecordProperties = new Set(['date', 'value'])
 
 function createMutateObj(mutateSet: Set<string>, obj: Dict){
   const mutateObj: Dict = {}
@@ -99,7 +100,6 @@ const EditLogGroup: RequestHandler = function(req, res, next){
 
 const LogRecord: RequestHandler = function (req, res, next){
   const dto = req.body as ToDict<PartialLogRecord>
-  console.log(dto)
 
   if (!dto || typeof(dto) !== 'object')
     throw ProblemDetails.UserError('Expected an object')
@@ -116,4 +116,20 @@ const LogRecord: RequestHandler = function (req, res, next){
   next()
 }
 
-export default {LogGroup, EditLogGroup, LogRecord}
+const EditLogRecord: RequestHandler = function (req, res, next){
+  const dto = req.body as ToDict<PartialLogRecord>
+
+  if (!dto || typeof(dto) !== 'object')
+    throw ProblemDetails.UserError('Expected an object')
+
+  if (dto.date != null && (!Date.parse(dto.date) || !Util.validDateRgx.test(dto.date)))
+    throw ProblemDetails.PropertyError('date', 'date is invalid, must be a valid date of type yyyy-mm-dd')
+
+  dto.value != null && ct('value', dto.value, 'number')
+
+  req.body = createMutateObj(mutableRecordProperties, dto)
+
+  next()
+}
+
+export default {LogGroup, EditLogGroup, LogRecord, EditLogRecord}

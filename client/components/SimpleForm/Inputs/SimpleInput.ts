@@ -52,6 +52,7 @@ export default class SimpleInput<T>{
   form: SimpleForm<object> | undefined
 
   onClick: MouseEventHandler | undefined
+  onFocus: React.FocusEventHandler<HTMLInputElement> | undefined
   onBlur: FocusEventHandler | undefined
 
   constructor(id: string, type: string){
@@ -67,6 +68,7 @@ export default class SimpleInput<T>{
     this.form = undefined
     this.onClick = undefined
     this.onBlur = undefined
+    this.onFocus = undefined
 
     this.#reload = undefined
 
@@ -105,7 +107,8 @@ export default class SimpleInput<T>{
       readOnly: props.readonly,
       title: props.title,
       onClick: props.onClick,
-      onBlur: props.onBlur
+      onBlur: props.onBlur,
+      onFocus: props.onFocus
     }
   }
 

@@ -44,7 +44,7 @@ export default class LogRecord implements ILogRecord{
   }
 
   getConvertedValue(): string{
-    return MetricHandler.convertFromBase(this.logGroup!.metric, this.logGroup!.unit, this.value) || ''
+    return MetricHandler.convertFromBase(this.logGroup.metric, this.logGroup.unit, this.value)
   }
 
   getLineGraphValue(): number{

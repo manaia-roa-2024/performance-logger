@@ -113,14 +113,12 @@ export const MetricHandler = (function(){
     const baseUnit = builder.metrics.get(metric)?.baseUnit
     if (baseUnit == null)
       throw new Error(`Invalid metric of ${metric}`)
-    console.log(builder.metrics.get(metric))
 
     if (!builder.metrics.get(metric)?.units.has(unit))
       throw new Error(`Invalid metric or unit of ${metric}(${unit})`)
 
     const converted = builder.metrics.get(metric)!.units.get(unit)!.convertToBase(value)
 
-    console.log(converted)
     return converted
     //return Number(convertTo(metric, unit, metric, baseUnit, value))
   }
@@ -130,7 +128,7 @@ export const MetricHandler = (function(){
     if (baseUnit == null)
       throw new Error(`Invalid metric of ${metric}(${unit})`)
 
-    return convertTo(metric, baseUnit, metric, toUnit, value.toString(), dp)
+    return convertTo(metric, baseUnit, metric, toUnit, value.toString(), dp)!
   }
 
   const hasMetric = function(metric: string){

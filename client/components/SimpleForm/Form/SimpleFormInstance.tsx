@@ -8,7 +8,7 @@ interface Props{
 }
 
 export interface ISimpleFormInstanceContext<T, V>{
-  form: SimpleForm<object>,
+  form: T,
   buildForm: BuildForm<T, V>
 }
 

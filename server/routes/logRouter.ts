@@ -3,6 +3,8 @@ import { Router } from "express";
 import * as db from '../db/dbUtil.ts'
 import BodyValidator from "../middleware/BodyValidator.ts";
 import connection from "../db/connection.ts";
+import { ILogRecord } from "../../models/classes/LogRecord.ts";
+import ProblemDetails from "../ProblemDetails.ts";
 
 const router = Router()
 
@@ -47,7 +49,16 @@ router.delete('/logrecord/:id', async (req, res) =>{
   res.sendStatus(201)
 })
 
+router.patch('/logrecord/:id', BodyValidator.EditLogRecord, async (req, res) =>{
+  const record = await connection('logRecord')
+    .update({...req.body}, '*')
+    .where({id: req.params.id}) as Array<ILogRecord>
+  
+  if (record.length != 1)
+    throw ProblemDetails.NullError('record')
 
+  res.json(record[0])
+})
 
 
 export default router

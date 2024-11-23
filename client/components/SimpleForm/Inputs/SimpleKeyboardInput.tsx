@@ -7,6 +7,7 @@ export default class SimpleKeyboardInput extends SimpleInput<string>{
   placeholder: string | undefined
   size: string | undefined
   onKeyDown: React.KeyboardEventHandler<HTMLInputElement> | undefined
+  onEnter: React.KeyboardEventHandler<HTMLInputElement> | undefined
 
   constructor(id: string, type: string){
     super(id, type)
@@ -14,6 +15,7 @@ export default class SimpleKeyboardInput extends SimpleInput<string>{
     this.placeholder = undefined
     this.size = undefined
     this.onKeyDown = undefined
+    this.onEnter = undefined
 
     this.value = ''
   }
@@ -25,7 +27,10 @@ export default class SimpleKeyboardInput extends SimpleInput<string>{
       placeholder: props.placeholder,
       size: this.size,
       onChange: (e: ChangeEvent<HTMLInputElement>) => this.updateValue(e.target.value),
-      onKeyDown: props.onKeyDown
+      onKeyDown(e: React.KeyboardEvent<HTMLInputElement>){
+        if (props.onEnter && e.key === 'Enter') props.onEnter(e)
+        if (props.onKeyDown) props.onKeyDown(e)
+      }
     }
   }
 }
