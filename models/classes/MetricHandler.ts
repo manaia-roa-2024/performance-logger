@@ -74,8 +74,9 @@ export const MetricHandler = (function(){
   const seconds = time.units.set('s', new BaseUnit(time, 'Seconds', 's'))
                   .set('duration', new Unit(time, 'hh:mm:ss', 'hh:mm:ss', UnitConverters.duration.toBase))
                   .get('s') as BaseUnit
-  seconds.converters.set('s', UnitConverters.Identity.fromBase)
+  seconds.converters.set('s', UnitConverters.seconds.fromBase)
                     .set('duration', UnitConverters.duration.fromBase)
+  seconds.convertToBase = UnitConverters.seconds.toBase
 
   const unit = new Metric('unit', 'Unit')
   const baseUnit = unit.units.set('unit', new BaseUnit(unit, 'Unit', 'units')).get('unit') as BaseUnit
@@ -140,14 +141,14 @@ export const MetricHandler = (function(){
   }
 
   const getMetricAliases = function(){
-    return Array.from(builder.metrics.entries(), ([key, value]) =>{
-      return value.alias
+    return Array.from(builder.metrics.entries(), (kv) =>{
+      return kv[1].alias
     })
   }
 
   const getUnitAliases = function(metric: string){
-    return Array.from(builder.metrics.get(metric)!.units.entries(), ([key, value]) =>{
-      return value.alias
+    return Array.from(builder.metrics.get(metric)!.units.entries(), (kv) =>{
+      return kv[1].alias
     })
   }
 

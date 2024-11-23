@@ -11,15 +11,8 @@ export default class SimpleTimeInput extends SimpleKeyboardInput{
 
     this.validTimeReg = /(^\d+:\d+:\d+$)|(^\d+:\d+$)|(^\d+$)/
     this.validInputReg = /(^\d*$)|(^\d*(:\d*)?$)|(^\d*:\d*(:\d*)?$)/
-  }
 
-  updateValue(newValue: string): void {
-    if (!this.validInputReg.test(newValue))
-      return
-
-    this.value = newValue
-
-    this.reload()
+    this.canInput = (newValue) => this.validInputReg.test(newValue)
   }
 
   getFullInputClass(props: InputProps<SimpleTimeInput>){

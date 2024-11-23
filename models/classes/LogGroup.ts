@@ -127,6 +127,10 @@ export default class LogGroup implements ILogGroup{
     return this.unit === 'duration'
   }
 
+  isTime(){
+    return this.metric === 'time'
+  }
+
   convertGraphValue(graphValue: number): string | number | null{
     switch (this.unit){
       case 'duration':

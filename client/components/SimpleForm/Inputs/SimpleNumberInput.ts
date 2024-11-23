@@ -17,15 +17,8 @@ export class SimpleNumberInput extends SimpleKeyboardInput{
 
     this.min = Number.MIN_SAFE_INTEGER
     this.max = Number.MAX_SAFE_INTEGER
-  }
 
-  updateValue(newValue: string): void {
-    if (!this.validInputReg.test(newValue) || (newValue.startsWith('-') && this.min >= 0))
-      return
-
-    this.value = newValue
-
-    this.reload()
+    this.canInput = (newValue) => this.validInputReg.test(newValue) && !(newValue.startsWith('-') && this.min >= 0)
   }
 
   getFullInputClass(props: InputProps<SimpleNumberInput>){

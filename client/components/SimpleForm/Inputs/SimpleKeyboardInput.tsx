@@ -8,6 +8,8 @@ export default class SimpleKeyboardInput extends SimpleInput<string>{
   size: string | undefined
   onKeyDown: React.KeyboardEventHandler<HTMLInputElement> | undefined
   onEnter: React.KeyboardEventHandler<HTMLInputElement> | undefined
+  canInput: (newValue: string) => boolean 
+
 
   constructor(id: string, type: string){
     super(id, type)
@@ -18,6 +20,15 @@ export default class SimpleKeyboardInput extends SimpleInput<string>{
     this.onEnter = undefined
 
     this.value = ''
+    this.canInput = () => true
+  }
+
+  updateValue(newValue: string): void {
+    if (!this.canInput(newValue)) return
+
+    this.value = newValue
+
+    this.reload()
   }
 
   spreadInput(props: InputProps<SimpleKeyboardInput>): {[key: string]: unknown}{

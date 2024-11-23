@@ -14,6 +14,7 @@ import editLogGroup from "../../apis/editLogGroup"
 import QCC from "../QCC"
 import LogRecord, { ILogRecord } from "../../../models/classes/LogRecord"
 import { NumberEntry, TimeEntry } from "../InputTemplates/Entries"
+import { SimpleNumberInput } from "../SimpleForm/Inputs/SimpleNumberInput"
 
 export interface ILogGroupContext {
   logGroup: LogGroup,
@@ -59,6 +60,10 @@ export class LGProvider extends React.Component<Props>{
       dateEntry.useContainer = false
 
       const valueEntry = logGroup.isDuration() ? TimeEntry() : NumberEntry()
+
+      if (valueEntry instanceof SimpleNumberInput && logGroup.isTime()){
+        valueEntry.min = 0
+      }
 
       const metricDropdown = new PickOneDropdownInput('metric-dropdown')
       metricDropdown.label = 'Metric'

@@ -52,9 +52,13 @@ export default class LogRecord implements ILogRecord{
     const unit = this.logGroup.unit
     switch (unit){
       case 'duration':
-        return this.value
+        return Math.abs(this.value)
     }
     return Number(this.getConvertedValue())
+  }
+
+  getInputId(): string{
+    return 'record-input-' + this.id
   }
 
   static getSorter(order: Order = "desc"){

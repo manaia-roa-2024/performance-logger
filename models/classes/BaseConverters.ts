@@ -26,6 +26,10 @@ const UnitConverters = {
     toBase: (x: string) => basic(x, n => n * 0.45359237),
     fromBase: (n: number) => (n / 0.45359237).toString()
   },
+  seconds: {
+    toBase: (x: string) => basic(x, n => Math.abs(n)),
+    fromBase: (n: number) => Math.abs(n).toString()
+  },
   duration: {
     toBase: (x: string) =>{
       const match = x.match(timeReg)
@@ -56,6 +60,7 @@ const UnitConverters = {
       return seconds
     },
     fromBase: (n: number) =>{
+      n = Math.abs(n)
       const hh = Math.floor(n / 3600)
       const mm = Math.floor((n % 3600) / 60)
       const ss = Math.round(n % 60)
