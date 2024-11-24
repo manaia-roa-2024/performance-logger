@@ -26,7 +26,7 @@ export default class CLogGroup extends Component<Props, State> {
     super(props)
 
     this.state = {
-      open: true,
+      open: false,
       lowerHeight: '0',
     }
     this.rand = Math.random()

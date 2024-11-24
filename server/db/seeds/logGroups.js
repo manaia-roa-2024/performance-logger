@@ -9,149 +9,58 @@ const rd = (start) =>{
   return randomDateTime(start || new Date(start), new Date(2025, 10, 9)).toISOString().substring(0, 10)
 }
 
-const seedLogGroups = [
-  /*{
-    name: 'New Performance Group',
-    metric: 'length',
-    unit: 'M',
-    created: rdt()
-  },
+const groups = [
   {
-    name: 'Free Kick Distance',
-    metric: 'length',
-    unit: 'M',
-    created: rdt()
-  },*/
-  {
-    name: 'Bulking Log',
+    id: 1,
+    name: 'Weight Log',
     metric: 'mass',
     unit: 'kg',
+    created: '2030-11-23T03:09:34.851Z'
+  },
+  {
+    id: 2,
+    name: '5k Run',
+    metric: 'time',
+    unit: 'duration',
     created: rdt()
   },
   {
-    name: "Height Log",
-    metric: "length",
-    unit: 'cm',
-    created: rdt()
-  },
-  {
+    id: 3,
     name: 'Steps Log',
     metric: 'unit',
     unit: 'unit',
     created: rdt()
   },
-  {
-    name: '5K Run',
-    metric: 'time',
-    unit: 'duration',
-    created: rdt()
-  },
-  {
-    name: 'Marathon',
-    metric: 'time',
-    unit: 'duration',
-    created: rdt()
-  }
 ]
 
-const getPrev = (records, groupId) =>{
-  return records[records.length - 1]?.logGroupId === groupId ? records[records.length - 1] : null
+const groupById = (id) =>{
+  return groups.find(x => x.id === id)
 }
 
-const seedRecords = (function(){
+const RecordBuilders = {
+  'Weight Log': () => [],
+  '5k Run': () => generateRandomRecords(2, 49, 1300, -15, 10),
+  'Steps Log': () => generateRandomRecords(3, 350, 7500, -50, 70) 
+}
+
+function generateRandomRecords(groupId, n, seedValue, deltaMin, deltaMax){
+  const group = groupById(groupId)
   const records = []
 
-
-  let recordDate = randomDateTime(new Date(2023, 11, 31), new Date(2024, 5, 30))
-  /*for (let i = 0; i < 49; i++){
-    const lg = seedLogGroups[1]
-
-    recordDate.setDate(recordDate.getDate() + 1)
-
+  const startDate = randomDateTime(new Date(2023, 11, 31), new Date(2024, 5, 30))
+  
+  for (let i = 0; i < n ;i++){
+    const prev = records[i-1]?.value ?? seedValue
+    startDate.setDate(startDate.getDate() + 1)
     records.push({
-      value: (8 + Math.random() * 30).toFixed(2),
-      date: Util.toISODate(recordDate),
-      created: rdt(new Date(lg.created)),
-      logGroupId: 2
-    })
-  }*/
-
-
-  recordDate = randomDateTime(new Date(2023, 11, 31), new Date(2024, 5, 30))
-
-  for (let i = 0; i < 70; i++){
-    const lg = seedLogGroups[0]
-
-    recordDate.setDate(recordDate.getDate() + 1)
-    const prev = getPrev(records, 1)
-    records.push({
-      value: (Number(prev?.value ?? 60) + (Math.random() * 0.35 - 0.1)).toFixed(1),
-      date: Util.toISODate(recordDate),
-      created: rdt(new Date(lg.created)),
-      logGroupId: 1
+      value: prev + (Math.random() * (deltaMax-deltaMin) + deltaMin),
+      date: Util.toISODate(startDate),
+      created: rdt(new Date(group.created)),
+      logGroupId: groupId
     })
   }
- 
-  recordDate = randomDateTime(new Date(2023, 11, 31), new Date(2024, 5, 30))
-
-  for (let i = 0; i < 70; i++){
-    const lg = seedLogGroups[1]
-
-    recordDate.setDate(recordDate.getDate() + 1)
-
-    records.push({
-      value: (1.4 + (0.0025 * i)).toFixed(4),
-      date: Util.toISODate(recordDate),
-      created: rdt(new Date(lg.created)),
-      logGroupId: 2
-    })
-  }
-
-  recordDate = randomDateTime(new Date(2023, 11, 31), new Date(2024, 5, 30))
-
-  for (let i = 0; i < 104; i++){
-    const lg = seedLogGroups[2]
-
-    recordDate.setDate(recordDate.getDate() + 1)
-    const prev = getPrev(records, 3)
-    records.push({
-      value: Math.round(Number(prev?.value ?? 10000) + (Math.random() * 150 - 50)),
-      date: Util.toISODate(recordDate),
-      created: rdt(new Date(lg.created)),
-      logGroupId: 3
-    })
-  }
-
-  recordDate = randomDateTime(new Date(2023, 11, 31), new Date(2024, 5, 30))
-  for (let i = 0; i < 56; i++){
-    const lg = seedLogGroups[3]
-
-    recordDate.setDate(recordDate.getDate() + 1)
-    const prev = getPrev(records, 4)
-    records.push({
-      value: Math.round(Number(prev?.value ?? 1260) + (Math.random() * 30 - 20)),
-      date: Util.toISODate(recordDate),
-      created: rdt(new Date(lg.created)),
-      logGroupId: 4
-    })
-  }
-
-  recordDate = randomDateTime(new Date(2023, 11, 31), new Date(2024, 5, 30))
-  for (let i = 0; i < 56; i++){
-    const lg = seedLogGroups[4]
-
-    recordDate.setDate(recordDate.getDate() + 1)
-    const prev = getPrev(records, 5)
-    records.push({
-      value: Math.round(Number(prev?.value ?? 10800) + (Math.random() * 120 - 90)),
-      date: Util.toISODate(recordDate),
-      created: rdt(new Date(lg.created)),
-      logGroupId: 5
-    })
-  }
-
   return records
-})()
+}
 
 export async function seed(knex){
   await knex('logRecord').del()
@@ -159,7 +68,10 @@ export async function seed(knex){
   await knex.raw("UPDATE sqlite_sequence SET seq = 0 WHERE name = 'logGroup'");
   await knex.raw("UPDATE sqlite_sequence SET seq = 0 WHERE name = 'logRecord'");
 
-  await knex('logGroup').insert(seedLogGroups)
-  await knex('logRecord').insert(seedRecords)
+  for (const group of groups){
+    await knex('logGroup').insert(group)
+    const records = RecordBuilders[group.name]()
+    if (records.length == 0) continue
+    await knex('logRecord').insert(records)
+  }
 }
-
