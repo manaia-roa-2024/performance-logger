@@ -6,6 +6,7 @@ export interface PartialLogGroup{
   name: string
   metric: string
   unit: string
+  groupBy: string
 }
 
 export interface ILogGroup extends PartialLogGroup{
@@ -43,6 +44,7 @@ export default class LogGroup implements ILogGroup{
   metric: string;
   unit: string
   created: string
+  groupBy: string;
 
   // entities
   logRecords: LogRecord[]
@@ -53,6 +55,7 @@ export default class LogGroup implements ILogGroup{
     this.metric = json.metric
     this.unit = json.unit
     this.created = json.created
+    this.groupBy = json.groupBy
     
     this.logRecords = []
   }

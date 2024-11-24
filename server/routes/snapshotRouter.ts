@@ -3,6 +3,8 @@ import connection from "../db/connection"
 import { ILogGroup } from "../../models/classes/LogGroup"
 import { ILogRecord } from "../../models/classes/LogRecord"
 import * as fs from 'node:fs/promises'
+import ProblemDetails from "../ProblemDetails"
+import Dict from "../../models/Dict"
 
 const snapshotRouter = Router()
 
@@ -36,6 +38,18 @@ async function createSnapshot(): Promise<Snapshot>{
   return snapshot
 }
 
+async function loadSnapshot(fileName: string): Promise<Snapshot>{
+  try{
+    const jsonString = await fs.readFile(`${snapshotPath}/${fileName}`, {encoding: 'utf8'})
+
+    return JSON.parse(jsonString) as Snapshot
+  } catch (e){
+    throw ProblemDetails.UserError('Snapshot does not exist')
+  }
+  
+  
+}
+
 (async function(){
   const files = await fs.readdir(snapshotPath)
   if (files.length === 0){
@@ -60,15 +74,40 @@ snapshotRouter.get('/', async (req, res) =>{
   res.json(snap)
 })
 
-snapshotRouter.post('/', async (req, res) =>{
-  const snapshot: Snapshot = req.body
+interface ILoadSnapshot{
+  snapshotId: string
+  createNewIds?: boolean
+}
 
-  const freshids = Boolean(req.query.freshids === '1')
-  console.log(freshids)
+function createInsert(tableName: string, columns: Array<string>, arr: Array<object>){
+
+  let query = `INSERT INTO ${tableName} (${columns.join(',')}) VALUES `
+  for (let i = 0; i < arr.length; i++){
+    query += '('
+    const obj = arr[i] as Dict
+    for (let j = 0; j < columns.length; j++){
+      const key = columns[j]
+      const value = obj[key]
+      query += (typeof(value) === 'string' ? `"${value}"` : `${value}`) 
+      query += (j + 1 === columns.length ? '' : ',')
+    }
+    query += ')'
+    query += (i + 1 === arr.length ? ';' : ',')
+  }
+  return query
+}
+
+snapshotRouter.post('/', async (req, res) =>{
+  const body: ILoadSnapshot = req.body
+
+  const snapshot = await loadSnapshot(body.snapshotId)
 
   for (const snapGroup of snapshot){
+    if (!body.createNewIds)
+      await connection('logGroup').delete().where({id: snapGroup.id})
+
     const result = await connection('logGroup').insert({
-      id: !freshids ? snapGroup.id : undefined,
+      id: body.createNewIds ? undefined : snapGroup.id,
       created: snapGroup.created,
       metric: snapGroup.metric,
       name: snapGroup.name,
@@ -77,17 +116,33 @@ snapshotRouter.post('/', async (req, res) =>{
 
     console.log(result)
 
-    await connection('logRecord').insert(snapGroup.logRecords.map(lr =>{
+    const queryRecords = snapGroup.logRecords.map(lr =>{
       return {
         value: lr.value,
         created: lr.created,
         logGroupId: result[0].id,
         date: lr.date
       }
-    }))
+    })//.slice(0, 5)
+
+    const insertStatement = createInsert('logRecord', ['value', 'created', 'logGroupId', 'date'], queryRecords)
+
+    await connection.raw(insertStatement)
+    /*const query = await connection('logRecord').insert(snapGroup.logRecords.map(lr =>{
+      return {
+        value: lr.value,
+        created: lr.created,
+        logGroupId: result[0].id,
+        date: lr.date
+      }
+    }).slice(0, 5)).toQuery()*/
+
+    //console.log(createInsert('logRecord', ['value', 'created', 'logGroupId', 'date'], queryRecords))
   }
 
   res.sendStatus(200)
 })
+
+
 
 export default snapshotRouter

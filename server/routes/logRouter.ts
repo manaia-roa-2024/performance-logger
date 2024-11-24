@@ -60,5 +60,11 @@ router.patch('/logrecord/:id', BodyValidator.EditLogRecord, async (req, res) =>{
   res.json(record[0])
 })
 
+router.delete('/deleteall', async (req, res) =>{
+  await connection('logRecord').delete()
+  await connection('logGroup').delete()
+  res.sendStatus(200)
+})
+
 
 export default router

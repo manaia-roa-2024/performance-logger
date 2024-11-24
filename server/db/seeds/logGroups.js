@@ -10,13 +10,13 @@ const rd = (start) =>{
 }
 
 const groups = [
-  {
+  /*{
     id: 1,
     name: 'Weight Log',
     metric: 'mass',
     unit: 'kg',
     created: '2030-11-23T03:09:34.851Z'
-  },
+  },*/
   {
     id: 2,
     name: '5k Run',
@@ -63,8 +63,7 @@ function generateRandomRecords(groupId, n, seedValue, deltaMin, deltaMax){
 }
 
 export async function seed(knex){
-  await knex('logRecord').del()
-  await knex('logGroup').del()
+  await knex('logGroup').del().whereNot({id: 1})
   await knex.raw("UPDATE sqlite_sequence SET seq = 0 WHERE name = 'logGroup'");
   await knex.raw("UPDATE sqlite_sequence SET seq = 0 WHERE name = 'logRecord'");
 
