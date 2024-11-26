@@ -10,7 +10,8 @@ export default class AddGroupButton extends Component {
     const mutationFn = () => addLogGroup({
       name: 'New Performance Group',
       metric: 'length',
-      unit: 'M'
+      unit: 'M',
+      groupBy: 'none'
     })
 
     const onSuccess = (json: ILogGroup, queryClient: QueryClient) =>{

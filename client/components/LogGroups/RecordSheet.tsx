@@ -1,5 +1,5 @@
 import { Component, ReactNode } from 'react'
-import LogRecord, { ILogRecord, PartialLogRecord } from '../../../models/classes/LogRecord'
+import { ILogRecord, PartialLogRecord } from '../../../models/classes/LogRecord'
 import { ISimpleFormInstanceContext, SimpleFormInstanceContext } from '../SimpleForm/Form/SimpleFormInstance'
 import { Box, VertBox } from '../Box'
 import SimpleDateInput from '../SimpleForm/Inputs/SimpleDateInput'
@@ -20,10 +20,11 @@ import { UseMutateFunction } from '@tanstack/react-query'
 import SimpleTimeInput from '../SimpleForm/Inputs/SimpleTimeInput'
 import SimpleForm from '../SimpleForm/Form/SimpleForm'
 import LogGroup from '../../../models/classes/LogGroup'
+import GroupedSheet from './GroupedSheet'
 
 
 interface Props {
-  logRecords: LogRecord[]
+  logGroup: LogGroup
 }
 
 export default class RecordSheet extends Component<Props> {
@@ -131,11 +132,24 @@ export default class RecordSheet extends Component<Props> {
             <CPickOneDropdown input='metric-dropdown'/>
             <CPickOneDropdown input='unit-dropdown'/>
           </Box>
+          <Box className='aic entry-row'>
+            <CPickOneDropdown input='groupby-dropdown'/>
+          </Box>
         </VertBox>
         <VertBox className="record-lower thin-scrollbar">
-          {this.props.logRecords.map((logRecord) => {
-            return <CLogRecord key={logRecord.id} logRecord={logRecord} />
-          })}
+          {this.props.logGroup.groupBy === 'none' && <>
+            <Box className="record-row">
+              <div className="record-cell static df aic bold">
+                Date
+              </div>
+              <div className="record-cell static df aic bold">
+                Value
+              </div>
+            </Box>
+            {this.props.logGroup.logRecords.map((logRecord) => <CLogRecord key={logRecord.id} logRecord={logRecord} />)}
+          
+          </>}
+          {this.props.logGroup.groupBy !== 'none' && <GroupedSheet/>}
         </VertBox>
       </div>
     )

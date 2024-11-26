@@ -73,7 +73,7 @@ export default class CLogGroup extends Component<Props, State> {
               <div ref={this.lowerRef} className={cls('log-lower', 'c-black', !this.state.open && 'closed')}
                 style={{ height: this.state.open ? undefined : '0' }}>
                 <Box className="log-inner">
-                  <RecordSheet logRecords={this.props.logGroup.logRecords} />
+                  <RecordSheet logGroup={this.props.logGroup} />
                   <GroupMain/>
                 </Box>
               </div>

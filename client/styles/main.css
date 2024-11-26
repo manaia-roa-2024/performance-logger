@@ -117,7 +117,7 @@ footer{
   width: var(--record-cell-width)
 }
 
-.record-cell:first-child{
+.record-cell.static{
   padding: 0 10px;
 }
 
@@ -350,4 +350,24 @@ dialog:focus-visible{
 
 .no:active{
   background-color: #8a8888;
+}
+
+.tooltip-group{
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.tooltip-group > .tool-tip-row{
+  display: flex;
+}
+
+.tooltip-group > .tool-tip-row > div:first-child{
+  flex-grow: 1;
+  padding-right: 30px;
+}
+
+.tooltip-group > .tac{
+  color:rgb(109,120,173);
+  margin-bottom: 2px;
 }

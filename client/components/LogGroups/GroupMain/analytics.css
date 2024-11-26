@@ -13,13 +13,17 @@
 }
 
 .ana-row{
-
+  align-items: center;
 }
 
 .ana-col{
-  width: 50%
+  flex-grow: 1;
+}
+
+.ana-col:first-child{
+  padding-right: 15px;
 }
 
 .ana-col:last-child{
-  width: 50%;
+  
 }

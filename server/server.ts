@@ -15,7 +15,7 @@ server.use(express.json())
 server.use('/api/v1/', logRouter)
 server.use('/api/v1/snapshots', snapshotRouter)
 
-server.post('/test', BodyValidator.LogRecord, async (req, res) =>{
+server.post('/test', BodyValidator.CreateLogGroup, async (req, res) =>{
   res.status(200)
   res.send("Yippy I O")
 })

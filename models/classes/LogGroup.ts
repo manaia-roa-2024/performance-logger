@@ -1,12 +1,15 @@
+import Util from "../../Util";
 import { Order } from "../Order";
 import LogRecord, { ILogRecord } from "./LogRecord";
 import { MetricHandler } from "./MetricHandler";
+
+export type GroupBy = 'none' | 'week' | 'month'
 
 export interface PartialLogGroup{
   name: string
   metric: string
   unit: string
-  groupBy: string
+  groupBy: GroupBy
 }
 
 export interface ILogGroup extends PartialLogGroup{
@@ -16,15 +19,29 @@ export interface ILogGroup extends PartialLogGroup{
 
 export interface RecordStats{
   records: number
-  mean: number | 'N/A',
-  median: number | 'N/A',
-  max: number | 'N/A',
-  min: number | 'N/A',
-  [key: string]: number | 'N/A'
+  mean: number | null
+  median: number | null
+  max: number | null
+  min: number | null
+  [key: string]: number | null
+}
+
+export interface GroupPeriod{
+  records: number
+  mean: number
+  median: number
+  max: number
+  min: number
+  //dateEnd: string
 }
 
 type AllString<T> = {
   [key in keyof T]: string
+}
+
+export type GroupStats = RecordStats &{
+  dateStart: string
+  dateEnd: string
 }
 
 /*
@@ -38,13 +55,15 @@ type AllString<T> = {
 */
 
 export default class LogGroup implements ILogGroup{
+  static GroupByOptions = new Set<string>(['none', 'week', 'month'])
+  static UnitBlacklist = new Set(['unit', 'duration'])
   //db
   id: number
   name: string
   metric: string;
   unit: string
   created: string
-  groupBy: string;
+  groupBy: GroupBy;
 
   // entities
   logRecords: LogRecord[]
@@ -66,6 +85,7 @@ export default class LogGroup implements ILogGroup{
     this.metric = json.metric
     this.unit = json.unit
     this.created = json.created
+    this.groupBy = json.groupBy
   }
 
   addJsonRecord(json: ILogRecord){
@@ -81,11 +101,15 @@ export default class LogGroup implements ILogGroup{
   }
 
   getAnalytics(): AllString<RecordStats>{
-    const values = this.logRecords.map(lr => lr.value).sort((a, b) => a - b)
+    return this.getStatsOfGroup(this.logRecords).formattedStats
+  }
 
-    let median: 'N/A' | number
+  getStatsOfGroup(records: Array<LogRecord>){
+    const values = records.map(lr => lr.value).sort((a, b) => a - b)
+
+    let median: null | number
     if (values.length === 0)
-      median = 'N/A'
+      median = null
     else if (values.length % 2 === 0)
       median = 0.5 * (values[values.length / 2] + values[values.length / 2 - 1])
     else
@@ -94,32 +118,70 @@ export default class LogGroup implements ILogGroup{
     const total = values.reduce((prev, cur) => prev + cur, 0)
       
     const preliminary = {
-      min: values[0] || 'N/A',
-      max: values[values.length - 1] || 'N/A',
+      min: values[0],
+      max: values[values.length - 1],
       median,
-      mean: values.length === 0 ? 'N/A' : total / values.length,
+      mean: values.length === 0 ? null : total / values.length,
       records: values.length
     } as RecordStats
 
-    const finalStats: AllString<RecordStats> = {
-      min: 'N/A',
-      max: 'N/A',
-      median: 'N/A',
-      mean: 'N/A',
-      records: 'N/A'
+    const formattedStats: AllString<RecordStats> = {
+      min: '',
+      max: '',
+      median: '',
+      mean: '',
+      records: ''
     }
-
-    const hideUnits = new Set(['unit', 'duration'])
 
     for (const key in preliminary){
       const value = preliminary[key]
-      if (key === 'records' || value === 'N/A'){
-        finalStats[key] = value.toString()
+      if (key === 'records'){
+        formattedStats.records = value!.toString()
+        continue
+      } else if (value == null){
+        formattedStats[key] = 'N/A'
         continue
       }
-      finalStats[key] = MetricHandler.convertFromBase(this.metric, this.unit, value)! + ' ' + (hideUnits.has(this.unit) ? '' : MetricHandler.getCode(this.metric, this.unit))
+      formattedStats[key] = this.getConvertedValueBlacklist(value)
     }
-    return finalStats
+    return {formattedStats, rawStats: preliminary}
+  }
+
+  getPeriodStart(isoDate: string){
+    return this.groupBy === 'week' ? Util.toISODate(Util.getWeekStart(Util.fromISO(isoDate))) : Util.toISODate(Util.getMonthStart(Util.fromISO(isoDate)))
+  }
+
+  getPeriodEnd(isoDate: string){
+    return this.groupBy === 'week' ? Util.toISODate(Util.getWeekEnd(Util.fromISO(isoDate))) : Util.toISODate(Util.getMonthEnd(Util.fromISO(isoDate)))
+  }
+
+  getGroupData(){ // Method depends on records being sorted by date in descending order
+    //const groups = new Map<string, GroupPeriod>()
+    const allStats: Array<GroupStats> = []
+
+    const groupIndexes: Array<number> = []
+
+    let lastPeriodStart: string | null = null
+    for (let i = this.logRecords.length - 1; i >= 0; i--){
+      const record = this.logRecords[i]
+      const periodStart = this.getPeriodStart(record.date)
+      if (periodStart != lastPeriodStart){
+        lastPeriodStart = periodStart
+        groupIndexes.push(i)
+      }
+    }
+
+    for (let i = groupIndexes.length - 1; i >= 0; i--){
+      const groupArr = this.logRecords.slice((groupIndexes[i+1] ?? -1) + 1, groupIndexes[i] + 1)
+      const {rawStats} = this.getStatsOfGroup(groupArr)
+
+      const rs = rawStats as GroupStats
+      rs.dateStart = this.getPeriodStart(groupArr[0].date)
+      rs.dateEnd = this.getPeriodEnd(groupArr[0].date)
+      allStats.push(rs)
+    }
+
+   return allStats
   }
 
   formId(){
@@ -134,7 +196,7 @@ export default class LogGroup implements ILogGroup{
     return this.metric === 'time'
   }
 
-  convertGraphValue(graphValue: number): string | number | null{
+  convertGraphValue(graphValue: number): string | number | null{ // value to display on graph instead of actual value
     switch (this.unit){
       case 'duration':
         return MetricHandler.convertFromBase(this.metric, this.unit, graphValue)
@@ -144,6 +206,24 @@ export default class LogGroup implements ILogGroup{
 
   sortRecords(){
     return this.logRecords.sort(LogRecord.getSorter())
+  }
+
+  getConvertedValue(value: number, includeSuffix = false){
+    return MetricHandler.convertFromBase(this.metric, this.unit, value) + 
+    ((!includeSuffix) ? '' : ' ' + MetricHandler.getCode(this.metric, this.unit))
+  }
+
+  getConvertedValueBlacklist(value: number){
+    return this.getConvertedValue(value, !LogGroup.UnitBlacklist.has(this.unit))
+  }
+
+  getLineGraphValue(value: number): number{ //real value to feed into graph,
+    const unit = this.unit
+    switch (unit){
+      case 'duration':
+        return Math.abs(value)
+    }
+    return Number(this.getConvertedValue(value))
   }
 
   static getSorter(order: Order = "desc"){

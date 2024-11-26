@@ -13,7 +13,7 @@ router.get('/loggroups', async (req, res) =>{
   res.json(logGroups)
 })
 
-router.post('/loggroups', BodyValidator.LogGroup, async (req, res) =>{
+router.post('/loggroups', BodyValidator.CreateLogGroup, async (req, res) =>{
   const result = await db.addGroup(req.body)
 
   res.status(201).json(result)
@@ -36,7 +36,7 @@ router.get('/logrecords', async (req, res) =>{
   res.status(201).json(logResults)
 })
 
-router.post('/logrecord', BodyValidator.LogRecord, async (req, res) =>{
+router.post('/logrecord', BodyValidator.CreateLogRecord, async (req, res) =>{
   const result = await db.addRecord(req.body)
   return res.json(result)
 })

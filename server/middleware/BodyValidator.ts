@@ -1,8 +1,8 @@
 import { RequestHandler } from "express";
-import { PartialLogGroup } from "../../models/classes/LogGroup";
+import LogGroup, { PartialLogGroup } from "../../models/classes/LogGroup";
 import ProblemDetails from "../ProblemDetails";
 import { MetricHandler } from "../../models/classes/MetricHandler";
-import Util from "../Util";
+import Util from "../../Util";
 import { PartialLogRecord } from "../../models/classes/LogRecord";
 import Dict from "../../models/Dict";
 import Optional from "../../models/Optional";
@@ -33,13 +33,13 @@ function cna(dto: Record<string, unknown>, ...propertyNames: Array<string>){ //c
   }
 }
 
-const LogGroup: RequestHandler = function(req, res, next){
+const CreateLogGroup: RequestHandler = function(req, res, next){
   const dto = req.body as ToDict<PartialLogGroup>
 
   if (!dto || typeof(dto) !== 'object')
     throw ProblemDetails.UserError('Expected an object')
 
-  cna(dto, 'name', 'metric', 'unit') // check that all the following properties are not null
+  cna(dto, 'name', 'metric', 'unit', 'groupBy') // check that all the following properties are not null
 
   ct('name', dto.name, 'string')
 
@@ -47,7 +47,10 @@ const LogGroup: RequestHandler = function(req, res, next){
     throw ProblemDetails.PropertyError('metric', `Invalid metric of '${dto.metric}'`)
 
   if (!MetricHandler.hasUnit(dto.metric, dto.unit))
-    throw ProblemDetails.PropertyError(dto.unit, `Invalid unit of '${dto.unit}'`)
+    throw ProblemDetails.PropertyError('unit', `Invalid unit of '${dto.unit}'`)
+
+  if (!LogGroup.GroupByOptions.has(dto.groupBy))
+    throw ProblemDetails.PropertyError('groupBy', `Invalid groupBy of ${dto.groupBy}`)
 
   req.body.name = Util.formatText(req.body.name)
 
@@ -57,7 +60,7 @@ const LogGroup: RequestHandler = function(req, res, next){
   next()
 }
 
-const mutableGroupProperties = new Set(['name', 'metric', 'unit'])
+const mutableGroupProperties = new Set(['name', 'metric', 'unit', 'groupBy'])
 const mutableRecordProperties = new Set(['date', 'value'])
 
 function createMutateObj(mutateSet: Set<string>, obj: Dict){
@@ -86,6 +89,9 @@ const EditLogGroup: RequestHandler = function(req, res, next){
   if (dto.unit != null && !MetricHandler.hasUnit(dto.metric!, dto.unit))
     throw ProblemDetails.PropertyError(dto.unit, `Invalid unit of '${dto.unit}'`)
 
+  if (dto.groupBy != null && !LogGroup.GroupByOptions.has(dto.groupBy))
+    throw ProblemDetails.PropertyError('groupBy', `Invalid groupBy of ${dto.groupBy}`)
+
   if (dto.name != null){
     req.body.name = Util.formatText(req.body.name)
 
@@ -98,7 +104,7 @@ const EditLogGroup: RequestHandler = function(req, res, next){
   next()
 }
 
-const LogRecord: RequestHandler = function (req, res, next){
+const CreateLogRecord: RequestHandler = function (req, res, next){
   const dto = req.body as ToDict<PartialLogRecord>
 
   if (!dto || typeof(dto) !== 'object')
@@ -132,4 +138,4 @@ const EditLogRecord: RequestHandler = function (req, res, next){
   next()
 }
 
-export default {LogGroup, EditLogGroup, LogRecord, EditLogRecord}
+export default {CreateLogGroup, EditLogGroup, CreateLogRecord, EditLogRecord}

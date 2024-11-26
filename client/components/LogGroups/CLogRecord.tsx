@@ -90,7 +90,7 @@ export class CLogRecord extends Component<Props, State> {
 
             return (
               <Box className={cls("record-row", this.state.recordFocused && 'focused')}>
-                <div className="record-cell df aic">
+                <div className="record-cell static df aic">
                   {this.props.logRecord.date}
                 </div>
                 <div className="record-cell df aic">

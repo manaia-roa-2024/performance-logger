@@ -1,5 +1,5 @@
 import React, { ContextType } from "react"
-import LogGroup, { ILogGroup } from "../../../models/classes/LogGroup"
+import LogGroup, { GroupBy, GroupStats, ILogGroup } from "../../../models/classes/LogGroup"
 import { ReactNode } from "react"
 import SimpleForm, { FormBuilder } from "../SimpleForm/Form/SimpleForm"
 import SimpleDateInput from "../SimpleForm/Inputs/SimpleDateInput"
@@ -15,6 +15,7 @@ import QCC from "../QCC"
 import LogRecord, { ILogRecord } from "../../../models/classes/LogRecord"
 import { NumberEntry, TimeEntry } from "../InputTemplates/Entries"
 import { SimpleNumberInput } from "../SimpleForm/Inputs/SimpleNumberInput"
+import groupByDropdown from "../InputTemplates/GroupByDropdown"
 
 export interface ILogGroupContext {
   logGroup: LogGroup,
@@ -25,7 +26,9 @@ export interface ILogGroupContext {
 
   addNewLogRecord: (json: ILogRecord) => void,
   updateExistingLogRecord: (json: ILogRecord) => void,
-  deleteExistingLogRecord: (id: number) => void
+  deleteExistingLogRecord: (id: number) => void,
+
+  groupData: Array<GroupStats>
 }
 
 type Props = {
@@ -84,6 +87,8 @@ export class LGProvider extends React.Component<Props>{
           unitDropdown.value = i
         return {key, value: unit.alias}
       })
+
+      const groupByDrop = groupByDropdown(logGroup)
       
 
       for (const logRecord of logGroup.logRecords) {
@@ -91,7 +96,7 @@ export class LGProvider extends React.Component<Props>{
       }
       this.updateCellValues(logGroup, form)
 
-      form.addInputs(nameInput, dateEntry, valueEntry, metricDropdown, unitDropdown)
+      form.addInputs(nameInput, dateEntry, valueEntry, metricDropdown, unitDropdown, groupByDrop)
     }
   }
 
@@ -131,12 +136,20 @@ export class LGProvider extends React.Component<Props>{
     return this.getForm().getInput('unit-dropdown') as PickOneDropdownInput
   }
 
+  getGroupByDropdown(){
+    return this.getForm().getInput('groupby-dropdown') as PickOneDropdownInput
+  }
+
   dropdownMetric(){
     return this.getMetricDropdown().getSelectedOption()?.key
   }
 
   dropdownUnit(){
     return this.getUnitDropdown().getSelectedOption()?.key
+  }
+
+  dropdownGroupBy(){
+    return this.getGroupByDropdown().getSelectedOption()?.key as GroupBy
   }
 
   render(): ReactNode {
@@ -199,8 +212,10 @@ export class LGProvider extends React.Component<Props>{
               return old + 1 % 1_000_000
             })
           }
+
+          const groupData = this.logGroup.getGroupData()
           return <LogGroupContext.Provider value={{reload: this.forceUpdate, logGroup: this.props.logGroup, deleteExistingGroup, 
-          updateExistingGroup, addNewLogRecord, updateExistingLogRecord, deleteExistingLogRecord}}>
+          updateExistingGroup, addNewLogRecord, updateExistingLogRecord, deleteExistingLogRecord, groupData}}>
             
             <SimpleFormContainer id={this.props.logGroup.formId()} formBuilder={this.formBuilder} variables={this.props.logGroup}>
               {
@@ -213,7 +228,8 @@ export class LGProvider extends React.Component<Props>{
                   const mutationFn = () => {
                     return editLogGroup({
                       metric: this.dropdownMetric(),
-                      unit: this.dropdownUnit()
+                      unit: this.dropdownUnit(),
+                      groupBy: this.dropdownGroupBy()
                     }, this.logGroup.id)
                   }
 
@@ -224,6 +240,7 @@ export class LGProvider extends React.Component<Props>{
                     ({mutate}) =>{
                       const md = this.getMetricDropdown()
                       const ud = this.getUnitDropdown()
+                      const gd = this.getGroupByDropdown()
                       md.updateValue = (newValue: number) =>{
                         md.value = newValue
                         const met = md.getSelectedOption()!.key
@@ -241,6 +258,14 @@ export class LGProvider extends React.Component<Props>{
                         mutate()
                         ud.reload()
                       }
+
+                      gd.updateValue = (newValue: number) =>{
+                        gd.value = newValue
+                        mutate()
+                        gd.reload()
+                      }
+
+
       
                       return this.props.children
                     }

@@ -1,6 +1,5 @@
 import { Order } from "../Order";
 import LogGroup from "./LogGroup";
-import { MetricHandler } from "./MetricHandler";
 
 //nullable means db determined
 export interface PartialLogRecord{
@@ -44,17 +43,12 @@ export default class LogRecord implements ILogRecord{
   }
 
   getConvertedValue(): string{
-    return MetricHandler.convertFromBase(this.logGroup.metric, this.logGroup.unit, this.value)
+    return this.logGroup.getConvertedValue(this.value)
   }
 
   getLineGraphValue(): number{
     //const metric = this.logGroup.metric
-    const unit = this.logGroup.unit
-    switch (unit){
-      case 'duration':
-        return Math.abs(this.value)
-    }
-    return Number(this.getConvertedValue())
+    return this.logGroup.getLineGraphValue(this.value)
   }
 
   getInputId(): string{

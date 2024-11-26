@@ -1,7 +1,7 @@
 import { ILogGroup, PartialLogGroup } from '../../models/classes/LogGroup.ts'
 import { ILogRecord, PartialLogRecord } from '../../models/classes/LogRecord.ts'
 import connection from './connection.ts'
-import Util from '../Util.ts'
+import Util from '../../Util.ts'
 import Optional from '../../models/Optional.ts'
 import ProblemDetails from '../ProblemDetails.ts'
 
