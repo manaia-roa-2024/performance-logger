@@ -134,6 +134,7 @@ export default class RecordSheet extends Component<Props> {
           </Box>
           <Box className='aic entry-row'>
             <CPickOneDropdown input='groupby-dropdown'/>
+            <CPickOneDropdown input='graphtype-dropdown'/>
           </Box>
         </VertBox>
         <VertBox className="record-lower thin-scrollbar">

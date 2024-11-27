@@ -40,6 +40,13 @@ export class CLogRecord extends Component<Props, State> {
     this.recordId = 'record-input-' + props.logRecord.id
   }
 
+  componentDidMount(): void {
+    if (this.props.logRecord.freshlyAdded){
+      this.props.logRecord.freshlyAdded = false
+      this.forceUpdate()
+    }
+  }
+
   render() {
     const record = this.props.logRecord
 
@@ -91,7 +98,7 @@ export class CLogRecord extends Component<Props, State> {
             }
 
             return (
-              <Box className={cls("record-row", this.state.recordFocused && 'focused')}>
+              <Box className={cls("record-row", this.state.recordFocused && 'focused', this.props.logRecord.freshlyAdded && 'freshly-added')}>
                 <div className='record-cell trash static simple-center' title='Delete Record' onClick={() => remove.mutate(this.props.logRecord.id)}>
                   <FontAwesomeIcon icon={faTrash}/>
                 </div>

@@ -10,6 +10,7 @@ export interface PartialLogGroup{
   metric: string
   unit: string
   groupBy: GroupBy
+  graphType: 'line' | 'column'
 }
 
 export interface ILogGroup extends PartialLogGroup{
@@ -56,6 +57,7 @@ export type GroupStats = RecordStats &{
 
 export default class LogGroup implements ILogGroup{
   static GroupByOptions = new Set<string>(['none', 'week', 'month'])
+  static GraphTypes = new Set(['line', 'column'])
   static UnitBlacklist = new Set(['unit', 'duration'])
   //db
   id: number
@@ -64,6 +66,7 @@ export default class LogGroup implements ILogGroup{
   unit: string
   created: string
   groupBy: GroupBy;
+  graphType: "line" | "column";
 
   // entities
   logRecords: LogRecord[]
@@ -75,6 +78,7 @@ export default class LogGroup implements ILogGroup{
     this.unit = json.unit
     this.created = json.created
     this.groupBy = json.groupBy
+    this.graphType = json.graphType
     
     this.logRecords = []
   }
@@ -86,6 +90,7 @@ export default class LogGroup implements ILogGroup{
     this.unit = json.unit
     this.created = json.created
     this.groupBy = json.groupBy
+    this.graphType = json.graphType
   }
 
   addJsonRecord(json: ILogRecord){
@@ -209,8 +214,17 @@ export default class LogGroup implements ILogGroup{
   }
 
   getConvertedValue(value: number, includeSuffix = false){
-    return MetricHandler.convertFromBase(this.metric, this.unit, value) + 
-    ((!includeSuffix) ? '' : ' ' + MetricHandler.getCode(this.metric, this.unit))
+    return includeSuffix ? this.getConvertedValueWithUnit(value) : MetricHandler.convertFromBase(this.metric, this.unit, value)
+  }
+
+  getConvertedValueWithUnit(value: number){
+    switch (this.unit){
+      case '$':{
+        const sym = value < 0 ? '-' : ''
+        return sym + '$' + MetricHandler.convertFromBase(this.metric, this.unit, Math.abs(value))
+      }
+    }
+    return MetricHandler.convertFromBase(this.metric, this.unit, value) + ' ' + MetricHandler.getCode(this.metric, this.unit)
   }
 
   getConvertedValueBlacklist(value: number){
@@ -224,6 +238,15 @@ export default class LogGroup implements ILogGroup{
         return Math.abs(value)
     }
     return Number(this.getConvertedValue(value))
+  }
+
+  getYLabel(): string | undefined{
+    if (this.unit === 'unit')
+      return undefined
+    else if (this.unit === '$')
+      return 'Dollars ($)'
+
+    return (`${MetricHandler.getMetricAlias(this.metric)} (${MetricHandler.getCode(this.metric, this.unit)})`)
   }
 
   static getSorter(order: Order = "desc"){

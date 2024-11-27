@@ -2,9 +2,7 @@ import { Component, ContextType, ReactNode } from "react"
 import CanvasJSReact from '@canvasjs/react-charts'
 import { LogGroupContext } from "../LGContext";
 import SimpleDateInput from "../../SimpleForm/Inputs/SimpleDateInput";
-import { MetricHandler } from "../../../../models/classes/MetricHandler";
 import Util from "../../../../Util";
-import cls from "../../SimpleForm/cls";
 
 const CanvasJSChart = CanvasJSReact.CanvasJSChart;
 
@@ -51,7 +49,7 @@ export default class Graphs extends Component{
           text: "Trend"
       },
       axisY: {
-        title: logGroup.unit === 'unit' ? undefined : (`${MetricHandler.getMetricAlias(logGroup.metric)} (${MetricHandler.getCode(logGroup.metric, logGroup.unit)})`),
+        title: logGroup.getYLabel(),
         labelFormatter: function(e: {value: number}){
           return logGroup.convertGraphValue(e.value)
         }
@@ -67,7 +65,7 @@ export default class Graphs extends Component{
         }
       },*/
       data: [{
-          type: "line",
+          type: logGroup.graphType,
           xValueFormatString: "MMM YYYY",
           yValueFormatString: "#,##0.00",
           dataPoints
@@ -138,7 +136,7 @@ export default class Graphs extends Component{
     max = logGroup.getLineGraphValue(max)
 
     const minimum = min - Math.abs(0.025 * min)
-    const maximum = logGroup.getLineGraphValue(max)
+   // const maximum = logGroup.getLineGraphValue(max)
 
 
     const options = {
@@ -147,7 +145,7 @@ export default class Graphs extends Component{
         text: "Trend"
       },
       axisY: {
-        title: 'Average ' + (logGroup.unit === 'unit' ? '' : (`${MetricHandler.getMetricAlias(logGroup.metric)} (${MetricHandler.getCode(logGroup.metric, logGroup.unit)})`)),
+        title: 'Average ' + logGroup.getYLabel(),
         labelFormatter: (e: {value: number}) =>{
           return logGroup.convertGraphValue(e.value)
         },
@@ -157,7 +155,7 @@ export default class Graphs extends Component{
         title: logGroup.groupBy === 'month' ? 'Month' : 'Week Number'
       },
       data: [{
-        type: 'column',
+        type: logGroup.graphType,
         dataPoints
       }]
     }

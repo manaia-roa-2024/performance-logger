@@ -56,10 +56,14 @@ export const MetricHandler = (function(){
   const metre = length.units.set('cm', new Unit(length, 'Centimeter', 'cm', UnitConverters.cm.toBase))
               .set('M', new BaseUnit(length, 'Meter', 'm'))
               .set('km', new Unit(length, 'Kilometer', 'km', UnitConverters.km.toBase))
+              .set('mi', new Unit(length, 'Mile', 'mi', UnitConverters.mi.toBase))
+              .set('ft', new Unit(length, 'Feet', 'ft', UnitConverters.ft.toBase))
               .get('M') as BaseUnit
   metre.converters.set('cm', UnitConverters.cm.fromBase)
                   .set('km', UnitConverters.km.fromBase)
                   .set('M', UnitConverters.Identity.fromBase)
+                  .set('mi', UnitConverters.mi.fromBase)
+                  .set('ft', UnitConverters.ft.fromBase)
 
   const mass = new Metric('kg', 'Weight')
   const kg = mass.units.set('kg', new BaseUnit(mass, 'Kilogram', 'kg'))
@@ -78,11 +82,16 @@ export const MetricHandler = (function(){
                     .set('duration', UnitConverters.duration.fromBase)
   seconds.convertToBase = UnitConverters.seconds.toBase
 
+  const currency = new Metric('$', 'Currency')
+  const dollars = currency.units.set('$', new BaseUnit(currency, 'Dollars', '$'))
+                  .get('$') as BaseUnit
+  dollars.converters.set('$', UnitConverters.Identity.fromBase)
+
   const unit = new Metric('unit', 'Unit')
   const baseUnit = unit.units.set('unit', new BaseUnit(unit, 'Unit', 'units')).get('unit') as BaseUnit
   baseUnit.converters.set('unit', UnitConverters.Identity.fromBase)
 
-  builder.metrics.set('length', length).set('mass', mass).set('unit', unit).set('time', time)
+  builder.metrics.set('length', length).set('mass', mass).set('unit', unit).set('time', time).set('currency', currency)
   
   const convertTo = function(fromMetricCode: string, fromUnitCode: string, toMetricCode: string, toUnitCode: string, value: string, dp: number = 4){
 

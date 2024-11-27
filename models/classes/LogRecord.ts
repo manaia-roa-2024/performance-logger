@@ -1,5 +1,5 @@
 import { Order } from "../Order";
-import LogGroup from "./LogGroup";
+import LogGroup from "./LogGroup";``
 
 //nullable means db determined
 export interface PartialLogRecord{
@@ -21,6 +21,9 @@ export default class LogRecord implements ILogRecord{
   created: string
   logGroupId: number
 
+  //other
+  freshlyAdded: boolean
+
   //entities
   logGroup: LogGroup
 
@@ -30,6 +33,8 @@ export default class LogRecord implements ILogRecord{
     this.date = record.date
     this.created = record.created
     this.logGroupId = record.logGroupId
+
+    this.freshlyAdded = false
 
     this.logGroup = group
   }

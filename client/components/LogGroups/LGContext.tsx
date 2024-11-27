@@ -16,6 +16,7 @@ import LogRecord, { ILogRecord } from "../../../models/classes/LogRecord"
 import { NumberEntry, TimeEntry } from "../InputTemplates/Entries"
 import { SimpleNumberInput } from "../SimpleForm/Inputs/SimpleNumberInput"
 import groupByDropdown from "../InputTemplates/GroupByDropdown"
+import GraphTypeDropdown from "../InputTemplates/GraphTypeDropdown"
 
 export interface ILogGroupContext {
   logGroup: LogGroup,
@@ -91,13 +92,14 @@ export class LGProvider extends React.Component<Props>{
 
       const groupByDrop = groupByDropdown(logGroup)
       
+      const graphDrop = GraphTypeDropdown(logGroup)
 
       for (const logRecord of logGroup.logRecords) {
         form.addInput(CellInput(logRecord))
       }
       this.updateCellValues(logGroup, form)
 
-      form.addInputs(nameInput, dateEntry, valueEntry, metricDropdown, unitDropdown, groupByDrop)
+      form.addInputs(nameInput, dateEntry, valueEntry, metricDropdown, unitDropdown, groupByDrop, graphDrop)
     }
   }
 
@@ -141,6 +143,10 @@ export class LGProvider extends React.Component<Props>{
     return this.getForm().getInput('groupby-dropdown') as PickOneDropdownInput
   }
 
+  getGraphTypeDropdown(){
+    return this.getForm().getInput('graphtype-dropdown') as PickOneDropdownInput
+  }
+
   dropdownMetric(){
     return this.getMetricDropdown().getSelectedOption()?.key
   }
@@ -151,6 +157,10 @@ export class LGProvider extends React.Component<Props>{
 
   dropdownGroupBy(){
     return this.getGroupByDropdown().getSelectedOption()?.key as GroupBy
+  }
+
+  dropdownGraphType(){
+    return this.getGraphTypeDropdown().getSelectedOption()?.key as 'line' | 'column'
   }
 
   render(): ReactNode {
@@ -186,6 +196,10 @@ export class LGProvider extends React.Component<Props>{
               const input = CellInput(newRecord)
               this.getForm().addInput(input)
               this.updateCellValue(newRecord)
+
+              if (this.logGroup.groupBy === 'none')
+                newRecord.freshlyAdded = true
+
               return old + 1 % 1_000_000
             })
           }
@@ -230,7 +244,8 @@ export class LGProvider extends React.Component<Props>{
                     return editLogGroup({
                       metric: this.dropdownMetric(),
                       unit: this.dropdownUnit(),
-                      groupBy: this.dropdownGroupBy()
+                      groupBy: this.dropdownGroupBy(),
+                      graphType: this.dropdownGraphType()
                     }, this.logGroup.id)
                   }
 
@@ -242,6 +257,7 @@ export class LGProvider extends React.Component<Props>{
                       const md = this.getMetricDropdown()
                       const ud = this.getUnitDropdown()
                       const gd = this.getGroupByDropdown()
+                      const gt = this.getGraphTypeDropdown()
                       md.updateValue = (newValue: number) =>{
                         md.value = newValue
                         const met = md.getSelectedOption()!.key
@@ -266,7 +282,11 @@ export class LGProvider extends React.Component<Props>{
                         gd.reload()
                       }
 
-
+                      gt.updateValue = (newValue: number) =>{
+                        gt.value = newValue
+                        mutate()
+                        gt.reload()
+                      }
       
                       return this.props.children
                     }

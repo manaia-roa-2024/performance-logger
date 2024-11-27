@@ -39,7 +39,7 @@ const CreateLogGroup: RequestHandler = function(req, res, next){
   if (!dto || typeof(dto) !== 'object')
     throw ProblemDetails.UserError('Expected an object')
 
-  cna(dto, 'name', 'metric', 'unit', 'groupBy') // check that all the following properties are not null
+  cna(dto, 'name', 'metric', 'unit', 'groupBy', 'graphType') // check that all the following properties are not null
 
   ct('name', dto.name, 'string')
 
@@ -52,6 +52,9 @@ const CreateLogGroup: RequestHandler = function(req, res, next){
   if (!LogGroup.GroupByOptions.has(dto.groupBy))
     throw ProblemDetails.PropertyError('groupBy', `Invalid groupBy of ${dto.groupBy}`)
 
+  if (!LogGroup.GraphTypes.has(dto.groupBy))
+    throw ProblemDetails.PropertyError('graphType', `Invalid graphType of ${dto.groupBy}`)
+
   req.body.name = Util.formatText(req.body.name)
 
   if (req.body.name.length < 1 || req.body.name.length > 32)
@@ -60,7 +63,7 @@ const CreateLogGroup: RequestHandler = function(req, res, next){
   next()
 }
 
-const mutableGroupProperties = new Set(['name', 'metric', 'unit', 'groupBy'])
+const mutableGroupProperties = new Set(['name', 'metric', 'unit', 'groupBy', 'graphType'])
 const mutableRecordProperties = new Set(['date', 'value'])
 
 function createMutateObj(mutateSet: Set<string>, obj: Dict){
@@ -91,6 +94,9 @@ const EditLogGroup: RequestHandler = function(req, res, next){
 
   if (dto.groupBy != null && !LogGroup.GroupByOptions.has(dto.groupBy))
     throw ProblemDetails.PropertyError('groupBy', `Invalid groupBy of ${dto.groupBy}`)
+
+  if (dto.graphType != null && !LogGroup.GraphTypes.has(dto.graphType))
+    throw ProblemDetails.PropertyError('graphType', `Invalid graphType of ${dto.graphType}`)
 
   if (dto.name != null){
     req.body.name = Util.formatText(req.body.name)

@@ -18,6 +18,14 @@ const UnitConverters = {
     toBase: (x: string) => basic(x, n => n * 1000),
     fromBase: (n: number) => (n / 1000).toString()
   },
+  mi: {
+    toBase: (x: string) => basic(x, n => n / 0.000621371),
+    fromBase: (n: number) => (n * 0.000621371).toString()
+  },
+  ft: {
+    toBase: (x: string) => basic(x, n => n / 3.28084),
+    fromBase: (n: number) => (n * 3.28084).toString()
+  },
   g: {
     toBase: (x: string) => basic(x, n => n / 1000),
     fromBase: (n: number) => (n * 1000).toString()

@@ -106,6 +106,12 @@ footer{
 }
 
 .record-row{
+  background-color: transparent;
+  transition: background-color 2s linear;
+}
+
+.freshly-added{
+  background-color: var(--header-bg);
 }
 
 .record-cell{
