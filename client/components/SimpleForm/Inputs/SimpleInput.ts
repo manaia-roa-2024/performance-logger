@@ -118,7 +118,7 @@ export default class SimpleInput<T>{
     }
   }
 
-  setReload(func: () => void){
+  setReload(func: (() => void) | undefined){
     this.#reload = func
   }
 

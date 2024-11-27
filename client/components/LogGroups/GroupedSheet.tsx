@@ -2,6 +2,7 @@ import { Component, ReactNode } from "react";
 import { ILogGroupContext, LogGroupContext } from "./LGContext";
 import { GroupStats } from "../../../models/classes/LogGroup";
 import { Box } from "../Box";
+import Util from "../../../Util";
 
 export default class GroupedSheet extends Component{
   static contextType = LogGroupContext;
@@ -10,15 +11,15 @@ export default class GroupedSheet extends Component{
     const gb = this.context.logGroup.groupBy
     return <>
       <Box className="record-row">
-        <div className="record-cell static df aic bold">
+        <div className="record-cell group-cell static df aic bold">
           {gb[0].toUpperCase() + gb.slice(1)}
         </div>
-        <div className="record-cell static df aic bold">
+        <div className="record-cell group-cell static df aic bold">
           Average
         </div>
       </Box>
       {
-        this.context.groupData.map((data, i, arr) => <GroupRecord key={data.dateStart} n={arr.length - i} data={data}/>)
+        this.context.groupData.map((data, i, arr) => <GroupRecord key={data.dateStart} groupIndex={gb === 'month' ? Util.toMonthAndYear(Util.fromISO(data.dateStart), false) : arr.length - i} data={data}/>)
       }
     </>
   }
@@ -26,7 +27,7 @@ export default class GroupedSheet extends Component{
 
 interface Props{
   data: GroupStats,
-  n: number
+  groupIndex: number | string
 }
 
 class GroupRecord extends Component<Props>{
@@ -35,10 +36,10 @@ class GroupRecord extends Component<Props>{
 
   render(): ReactNode {
     return <Box className="record-row">
-      <div className="record-cell static df aic">
-        {this.props.n}
+      <div className="record-cell group-cell static df aic">
+        {this.props.groupIndex}
       </div>
-      <div className="record-cell static df aic">
+      <div className="record-cell group-cell static df aic">
         {this.context.logGroup.getConvertedValue(this.props.data.mean!)}
       </div>
     </Box>

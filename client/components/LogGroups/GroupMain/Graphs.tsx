@@ -4,6 +4,7 @@ import { LogGroupContext } from "../LGContext";
 import SimpleDateInput from "../../SimpleForm/Inputs/SimpleDateInput";
 import { MetricHandler } from "../../../../models/classes/MetricHandler";
 import Util from "../../../../Util";
+import cls from "../../SimpleForm/cls";
 
 const CanvasJSChart = CanvasJSReact.CanvasJSChart;
 
@@ -12,6 +13,20 @@ export default class Graphs extends Component{
   static contextType = LogGroupContext;
 
   context!: ContextType<typeof LogGroupContext>
+
+  removeCanvasJSLink(){
+    const link = document.querySelector(`#log-graph-${this.context.logGroup.id} .canvasjs-chart-credit`)
+    if (link)
+      link.remove()
+  }
+
+  componentDidMount(): void {
+    this.removeCanvasJSLink()
+  }
+
+  componentDidUpdate(): void {
+    this.removeCanvasJSLink()
+  }
 
   completeLineGraph(){ // line graph using all data points
     const logGroup = this.context.logGroup
@@ -41,6 +56,9 @@ export default class Graphs extends Component{
           return logGroup.convertGraphValue(e.value)
         }
       },
+      axisX: {
+        title: 'Date'
+      },
       /*toolTip:{
         contentFormatter: function(e){
           const str = ""
@@ -68,7 +86,7 @@ export default class Graphs extends Component{
       const x = arr.length - i
       const y = logGroup.getLineGraphValue(gd.mean!)
 
-      const toolTipRow = (key: string, value: string | number, className="") =>{
+      const toolTipRow = (key: string, value: string | number) =>{
         return `
         <div class="tool-tip-row">
           <div>${key}</div>
@@ -82,12 +100,16 @@ export default class Graphs extends Component{
       /*const rangeStr = logGroup.groupBy === 'month' ? `${ds.getDate()} ${Util.shortHandMonths[ds.getMonth()]} ${ds.getFullYear()} to ${de.getDate()} ${Util.shorthandMonths[de.getMonth()]} ${de.getFullYear()}`
         : `${gd.dateStart} to ${gd.dateEnd}`*/
 
-      const rangeStr = logGroup.groupBy === 'month' ? `${Util.longHandMonths[ds.getMonth()]} ${ds.getFullYear()}` : `${gd.dateStart}&nbsp;&nbsp;to&nbsp;&nbsp;${gd.dateEnd}`
+      const monthText = Util.toMonthAndYear(ds)
+      const rangeStr = logGroup.groupBy === 'month' ? monthText : `${gd.dateStart}&nbsp;&nbsp;to&nbsp;&nbsp;${gd.dateEnd}`
 
       const toolTipContent = 
       `
       <div class="tooltip-group">
-        <div class='tac'>${rangeStr}</div>
+        <div class='tac'>
+          ${logGroup.groupBy === 'week' ? 'Week ' + x : ''}
+          <div>${rangeStr}</div>
+        </div>
         ${toolTipRow('Records', gd.records)}
         ${toolTipRow('Average', logGroup.getConvertedValueBlacklist(gd.mean!))}
         ${toolTipRow('Median', logGroup.getConvertedValueBlacklist(gd.median!))}
@@ -100,7 +122,7 @@ export default class Graphs extends Component{
       return {
         x,
         y,
-        label: x,
+        label: logGroup.groupBy === 'month' ? Util.toMonthAndYear(ds, false) : x,
         toolTipContent
       }
     })
@@ -131,6 +153,9 @@ export default class Graphs extends Component{
         },
         minimum: this.context.groupData.length > 0 ? minimum : undefined,
       },
+      axisX: {
+        title: logGroup.groupBy === 'month' ? 'Month' : 'Week Number'
+      },
       data: [{
         type: 'column',
         dataPoints
@@ -141,12 +166,11 @@ export default class Graphs extends Component{
   }
 
   render(): ReactNode {
-
     const logGroup = this.context.logGroup
 
     const options = logGroup.groupBy === 'none' ? this.completeLineGraph() : this.groupedBarChart()
 
-    return <div className="graphs gm-content">
+    return <div id={'log-graph-' + logGroup.id} className={"graphs gm-content"}>
       <CanvasJSChart options = {options}
 		/* onRef = {ref => this.chart = ref} */
 		/>

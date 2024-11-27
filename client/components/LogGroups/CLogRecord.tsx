@@ -12,6 +12,8 @@ import LogGroup from '../../../models/classes/LogGroup'
 import SimpleForm from '../SimpleForm/Form/SimpleForm'
 import { MetricHandler } from '../../../models/classes/MetricHandler'
 import SimpleTextInput from '../SimpleForm/Inputs/SimpleTextInput'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { faTrash } from '@fortawesome/free-solid-svg-icons'
 
 interface Props{
   logRecord: LogRecord
@@ -48,7 +50,7 @@ export class CLogRecord extends Component<Props, State> {
 
             const keyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
               if (e.key === 'Delete') {
-                remove.mutate(this.props.logRecord.id!)
+                //remove.mutate(this.props.logRecord.id)
               }
             }
         
@@ -90,6 +92,9 @@ export class CLogRecord extends Component<Props, State> {
 
             return (
               <Box className={cls("record-row", this.state.recordFocused && 'focused')}>
+                <div className='record-cell trash static simple-center' title='Delete Record' onClick={() => remove.mutate(this.props.logRecord.id)}>
+                  <FontAwesomeIcon icon={faTrash}/>
+                </div>
                 <div className="record-cell static df aic">
                   {this.props.logRecord.date}
                 </div>

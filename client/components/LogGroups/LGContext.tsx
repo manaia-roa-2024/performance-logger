@@ -50,6 +50,7 @@ export class LGProvider extends React.Component<Props>{
   constructor(props: Props){
     super(props)
     this.logGroup = props.logGroup
+    const dateEntry = new SimpleDateInput('date-entry')
     this.formBuilder = (form, logGroup) => {
       const nameInput = new SimpleTextInput('name')
       nameInput.useContainer = false
@@ -57,10 +58,10 @@ export class LGProvider extends React.Component<Props>{
       nameInput.value = logGroup.name
       nameInput.placeholder = 'Enter Name'
 
-      const dateEntry = new SimpleDateInput('date-entry')
       dateEntry.inputClass = 'entry-input entry-date'
       dateEntry.useInputBox = false
       dateEntry.useContainer = false
+      dateEntry.setReload(undefined)
 
       const valueEntry = logGroup.isDuration() ? TimeEntry() : NumberEntry()
 

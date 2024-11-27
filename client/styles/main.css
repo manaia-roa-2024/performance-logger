@@ -125,6 +125,21 @@ footer{
   border-right: 0;
 }
 
+.record-cell.trash{
+  width: calc(100% - 2*(var(--record-cell-width)));
+  cursor: pointer;
+  color: rgb(90, 90, 90);
+  font-size: 15px;
+}
+
+.record-cell.trash:hover{
+  color: red;
+}
+
+.record-cell.group-cell{
+  width: 50%;
+}
+
 .cell-input{
   outline: none;
   background-color: transparent;
@@ -294,6 +309,7 @@ footer{
   cursor: pointer;
 }
 
+
 dialog.bp-popup{
   padding: 0;
   background-color: transparent;
@@ -370,4 +386,7 @@ dialog:focus-visible{
 .tooltip-group > .tac{
   color:rgb(109,120,173);
   margin-bottom: 2px;
+  display: flex;
+  gap: 5px;
+  flex-direction: column;
 }

@@ -38,7 +38,7 @@ class DeleteGroupButton extends Component{
     }
 
     const mutationFn = () =>{
-      return deleteLogGroup(this.context.logGroup.id!)
+      return deleteLogGroup(this.context.logGroup.id)
     }
 
     const onSuccess = () =>{
@@ -55,7 +55,7 @@ class DeleteGroupButton extends Component{
       <GenericPopup id={'delete-group-' + this.context.logGroup.id} className="shadow">
         <VertBox className="delete-popup shadow">
           <div className="simple-center prompt">
-            <p>Are you sure you want to delete this group?</p>
+            <p>Are you sure you want to delete this group? ({this.context.logGroup.name})</p>
           </div>
             <MutationComponent mutationFn={mutationFn} onSettled={onSettled} onSuccess={onSuccess}>
               {({mutate}) =>{

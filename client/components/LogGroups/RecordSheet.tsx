@@ -139,6 +139,9 @@ export default class RecordSheet extends Component<Props> {
         <VertBox className="record-lower thin-scrollbar">
           {this.props.logGroup.groupBy === 'none' && <>
             <Box className="record-row">
+              <div style={{cursor: 'default'}} className='record-cell trash static simple-center'>
+                  
+              </div>
               <div className="record-cell static df aic bold">
                 Date
               </div>
