@@ -11,7 +11,8 @@ export default class AddGroupButton extends Component {
       name: 'New Performance Group',
       metric: 'length',
       unit: 'M',
-      groupBy: 'none'
+      groupBy: 'none',
+      graphType: 'line'
     })
 
     const onSuccess = (json: ILogGroup, queryClient: QueryClient) =>{

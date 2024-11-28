@@ -78,9 +78,14 @@ footer{
 }
 
 .log-lower.closed{
+  /*pointer-events: none;
+  opacity: 0;
+  user-select: none;*/
 }
 
+
 .log-inner{
+  flex-direction: row-reverse;
 }
 
 .record-sheet{
@@ -107,7 +112,7 @@ footer{
 
 .record-row{
   background-color: transparent;
-  transition: background-color 2s linear;
+  transition: background-color 1.5s;
 }
 
 .freshly-added{
@@ -207,7 +212,7 @@ footer{
   align-items: center;
 }
 
-.sf-dropdown-option:hover{
+.sf-dropdown-option:hover, .sf-dropdown-option.keyboard{
   background-color: #eee;
 }
 
@@ -241,6 +246,11 @@ footer{
   border-radius: 4px;
   cursor: pointer;
   border: var(--record-sheet-border);
+}
+
+.data-entry-plus.invalid-entry{
+  background: linear-gradient(180deg, rgb(224, 224, 224), rgb(163, 163, 163)) !important;
+  pointer-events: none !important;
 }
 
 .data-entry-plus:hover{
@@ -278,8 +288,9 @@ footer{
   background-color: #505050;
 }
 
-.log-group-head:hover .edit-pen{
+.log-group-head:hover .edit-pen, .edit-pen:focus{
   opacity: 1;
+  color: rgb(241, 243, 137);
 }
 
 .edit-title-input{

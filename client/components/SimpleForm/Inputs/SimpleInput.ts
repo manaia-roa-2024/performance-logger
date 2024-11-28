@@ -39,6 +39,7 @@ export default class SimpleInput<T>{
   containerClass: string | undefined
   inputBoxClass: string | undefined
 
+
   useContainer: boolean
   useInputBox: boolean
 
@@ -49,6 +50,7 @@ export default class SimpleInput<T>{
   name: string | undefined
   readonly: boolean
   title: string | undefined
+  tabIndex: number | undefined
   form: SimpleForm<object> | undefined
 
   onClick: MouseEventHandler | undefined
@@ -65,6 +67,7 @@ export default class SimpleInput<T>{
     this.title = undefined
     this.inputBoxClass = undefined
     this.dtoName = undefined
+    this.tabIndex = undefined
     this.form = undefined
     this.onClick = undefined
     this.onBlur = undefined
@@ -108,7 +111,8 @@ export default class SimpleInput<T>{
       title: props.title,
       onClick: props.onClick,
       onBlur: props.onBlur,
-      onFocus: props.onFocus
+      onFocus: props.onFocus,
+      tabIndex: props.tabIndex
     }
   }
 

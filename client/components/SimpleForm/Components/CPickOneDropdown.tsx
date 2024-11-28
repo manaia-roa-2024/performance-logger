@@ -13,7 +13,7 @@ export default function CPickOneDropdown(props: InputProps<PickOneDropdownInput>
     <InputContainer finalProps={finalProps}>
       <PickOneDropdown id={finalProps.elementId} className={input.getFullInputClass(finalProps)} options={finalProps.options || []}
       selectedOption={finalProps.value} defaultButtonText={finalProps.defaultButtonText} optionClick={(o: DropdownOption, i: number) => input.updateValue(i)}
-      angleIcon={finalProps.angleIcon}/>
+      angleIcon={finalProps.angleIcon} tabIndex={props.tabIndex}/>
     </InputContainer>
   )
 }

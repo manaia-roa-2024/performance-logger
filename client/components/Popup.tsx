@@ -24,7 +24,7 @@ export const GenericPopup = ({children, className, id, onClose}: Props) => {
 
     }, [])
   return (
-    <dialog className={cls(className, 'bp-popup')} id={id}>
+    <dialog className={cls(className, 'bp-popup')} id={id} tabIndex={-1}>
         <div className='popup-content-container'>
             {children} 
         </div>

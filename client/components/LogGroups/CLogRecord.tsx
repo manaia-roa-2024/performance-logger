@@ -1,7 +1,7 @@
 import { Component, ReactNode, useContext} from 'react'
 import LogRecord, { ILogRecord } from '../../../models/classes/LogRecord'
 import { Box } from '../Box'
-import { LogGroupContext } from './LGContext'
+import { ILogGroupContext, LogGroupContext } from './LGContext'
 import CTextInput from '../SimpleForm/Components/CTextInput'
 import deleteRecord from '../../apis/deleteRecord'
 import { useMutation, UseMutationResult } from '@tanstack/react-query'
@@ -14,6 +14,7 @@ import { MetricHandler } from '../../../models/classes/MetricHandler'
 import SimpleTextInput from '../SimpleForm/Inputs/SimpleTextInput'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faTrash } from '@fortawesome/free-solid-svg-icons'
+import Util from '../../../Util'
 
 interface Props{
   logRecord: LogRecord
@@ -98,17 +99,23 @@ export class CLogRecord extends Component<Props, State> {
             }
 
             return (
-              <Box className={cls("record-row", this.state.recordFocused && 'focused', this.props.logRecord.freshlyAdded && 'freshly-added')}>
-                <div className='record-cell trash static simple-center' title='Delete Record' onClick={() => remove.mutate(this.props.logRecord.id)}>
-                  <FontAwesomeIcon icon={faTrash}/>
-                </div>
-                <div className="record-cell static df aic">
-                  {this.props.logRecord.date}
-                </div>
-                <div className="record-cell df aic">
-                  <CTextInput input={'record-input-' + this.props.logRecord.id} onEnter={onEnter} onKeyDown={keyDown} onFocus={onFocus} onBlur={onBlur}/>
-                </div>
-              </Box>
+              <LogGroupContext.Consumer>
+                {(context: ILogGroupContext) =>{
+                  
+                  return <Box className={cls("record-row", this.state.recordFocused && 'focused', this.props.logRecord.freshlyAdded && 'freshly-added')}>
+                    <div tabIndex={context.tabIndex} role="button" onKeyDown={Util.divButtonHandler} className='record-cell trash static simple-center' title='Delete Record' onClick={() => remove.mutate(this.props.logRecord.id)}>
+                      
+                      <FontAwesomeIcon icon={faTrash}/>
+                    </div>
+                    <div className="record-cell static df aic">
+                      {this.props.logRecord.date}
+                    </div>
+                    <div className="record-cell df aic">
+                      <CTextInput input={'record-input-' + this.props.logRecord.id} onEnter={onEnter} onKeyDown={keyDown} onFocus={onFocus} onBlur={onBlur} tabIndex={context.tabIndex}/>
+                    </div>
+                  </Box>
+                }}
+              </LogGroupContext.Consumer>
             )
           }
         } 

@@ -30,11 +30,14 @@ export interface ILogGroupContext {
   deleteExistingLogRecord: (id: number) => void,
 
   groupData: Array<GroupStats>
+  open: boolean
+  tabIndex: number | undefined
 }
 
 type Props = {
   children?: ReactNode, 
-  logGroup: LogGroup
+  logGroup: LogGroup,
+  open: boolean,
 }
 
 export const LogGroupContext = React.createContext<ILogGroupContext>({} as unknown as ILogGroupContext)
@@ -230,7 +233,7 @@ export class LGProvider extends React.Component<Props>{
 
           const groupData = this.logGroup.getGroupData()
           return <LogGroupContext.Provider value={{reload: this.forceUpdate, logGroup: this.props.logGroup, deleteExistingGroup, 
-          updateExistingGroup, addNewLogRecord, updateExistingLogRecord, deleteExistingLogRecord, groupData}}>
+          updateExistingGroup, addNewLogRecord, updateExistingLogRecord, deleteExistingLogRecord, groupData, open: this.props.open, tabIndex: this.props.open ? 0 : -1}}>
             
             <SimpleFormContainer id={this.props.logGroup.formId()} formBuilder={this.formBuilder} variables={this.props.logGroup}>
               {

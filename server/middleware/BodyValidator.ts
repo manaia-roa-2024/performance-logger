@@ -52,8 +52,8 @@ const CreateLogGroup: RequestHandler = function(req, res, next){
   if (!LogGroup.GroupByOptions.has(dto.groupBy))
     throw ProblemDetails.PropertyError('groupBy', `Invalid groupBy of ${dto.groupBy}`)
 
-  if (!LogGroup.GraphTypes.has(dto.groupBy))
-    throw ProblemDetails.PropertyError('graphType', `Invalid graphType of ${dto.groupBy}`)
+  if (!LogGroup.GraphTypes.has(dto.graphType))
+    throw ProblemDetails.PropertyError('graphType', `Invalid graphType of ${dto.graphType}`)
 
   req.body.name = Util.formatText(req.body.name)
 

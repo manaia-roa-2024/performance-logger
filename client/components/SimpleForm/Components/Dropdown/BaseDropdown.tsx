@@ -9,21 +9,12 @@ export interface DropdownProps{
   buttonText?: string,
   className?: string,
   id?: string,
-  angleIcon?: ReactNode
+  angleIcon?: ReactNode,
+  onKeyDown: (e: React.KeyboardEvent<HTMLDivElement>, dropdownOpen: boolean) => void,
+  buttonTabIndex: number | undefined
 }
 
-interface BaseDropdownProps{
-  open: boolean,
-  buttonText?: string,
-  contentId: string,
-  buttonId: string,
-  children?: ReactNode,
-  id?: string,
-  className?: string,
-  angleIcon?: ReactNode
-}
-
-export function Dropdown({beforeDropdownClick, buttonText, children, className, id, angleIcon}: DropdownProps){
+export function Dropdown({beforeDropdownClick, buttonText, children, className, id, angleIcon, onKeyDown, buttonTabIndex}: DropdownProps){
   const [dropdownOpen, setDropdownOpen] = useState(false)
   const buttonId = useRef(getRandomHtmlId())
   const contentId = useRef(getRandomHtmlId())
@@ -38,7 +29,9 @@ export function Dropdown({beforeDropdownClick, buttonText, children, className, 
         //setDropdownOpen(false)
       } else if (element.closest(`#${buttonId.current}`) != null){
         if (beforeDropdownClick && beforeDropdownClick('button_click', element, setDropdownOpen)) return
-        setDropdownOpen(prev => !prev)
+        setDropdownOpen(prev => {
+          return !prev
+        })
       } else{
         if (beforeDropdownClick && beforeDropdownClick('other_click', element, setDropdownOpen)) return
         setDropdownOpen(false)
@@ -50,14 +43,21 @@ export function Dropdown({beforeDropdownClick, buttonText, children, className, 
     return () => document.removeEventListener('click', clickEvent)
   }, [])
 
-  return <BaseDropdown className={className} id={id} open={dropdownOpen} buttonText={buttonText} contentId={contentId.current} buttonId={buttonId.current} angleIcon={angleIcon}>
-    {children}
-  </BaseDropdown>
-}
+  const keyDown = (e: React.KeyboardEvent<HTMLDivElement>) =>{
+    const target = e.target as HTMLDivElement
+    if (e.key === 'Enter'){
+      target.click()
+    }
+    onKeyDown(e, dropdownOpen)
+  }
 
-function BaseDropdown({id, className, open, buttonText, children, contentId, buttonId, angleIcon}: BaseDropdownProps){
-  return <div id={id} className={cls('sf-dropdown', className, open ? 'sf-dropdown-open' : 'sf-dropdown-closed')}>
-    <div className='sf-dropdown-button' id={buttonId}>
+  const onBlur = () =>{
+    console.log('Blurry')
+    setTimeout(() => setDropdownOpen(false), 100)
+  }
+
+  return <div id={id} className={cls('sf-dropdown', className, dropdownOpen ? 'sf-dropdown-open' : 'sf-dropdown-closed')}>
+    <div role="button" tabIndex={buttonTabIndex} onKeyDown={keyDown} className='sf-dropdown-button' id={buttonId.current} onBlur={onBlur}>
       <div className='sf-button-text'>
         {buttonText || ''}
       </div>
@@ -66,7 +66,7 @@ function BaseDropdown({id, className, open, buttonText, children, contentId, but
       </div>
       
     </div>
-    <div className='sf-dropdown-content' id={contentId}>
+    <div className='sf-dropdown-content' id={contentId.current}>
       {children}
     </div>
   </div>

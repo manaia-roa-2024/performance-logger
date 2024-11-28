@@ -242,7 +242,7 @@ export default class LogGroup implements ILogGroup{
 
   getYLabel(): string | undefined{
     if (this.unit === 'unit')
-      return undefined
+      return ''
     else if (this.unit === '$')
       return 'Dollars ($)'
 

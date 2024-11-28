@@ -6,6 +6,7 @@ import { GenericPopup } from "../../Popup";
 import { LogGroupContext } from "../LGContext";
 import MutationComponent from "../../MutationComponent";
 import deleteLogGroup from "../../../apis/deleteLogGroup";
+import Util from "../../../../Util";
 
 export default class SettingPannel extends Component{
   render(): ReactNode {
@@ -34,7 +35,8 @@ class DeleteGroupButton extends Component{
 
     const noClick = () =>{
       const popup = document.getElementById(popupId) as HTMLDialogElement
-      popup.close()
+      setTimeout(() => popup.close(), 100)
+      //popup.close()
     }
 
     const mutationFn = () =>{
@@ -54,22 +56,22 @@ class DeleteGroupButton extends Component{
     <>
       <GenericPopup id={'delete-group-' + this.context.logGroup.id} className="shadow">
         <VertBox className="delete-popup shadow">
-          <div className="simple-center prompt">
+          <div tabIndex={0} className="simple-center prompt">
             <p>Are you sure you want to delete this group? ({this.context.logGroup.name})</p>
           </div>
             <MutationComponent mutationFn={mutationFn} onSettled={onSettled} onSuccess={onSuccess}>
               {({mutate}) =>{
                 return <Box className="prompt-buttons">
-                  <div className="fg1 yes simple-center ynb" onClick={() => mutate()}>Yes</div>
-                  <div className="fg1 no simple-center ynb" onClick={noClick}>No</div>
+                  <div role="button" tabIndex={0} onKeyDown={Util.divButtonHandler} className="fg1 yes simple-center ynb" onClick={() => mutate()}>Yes</div>
+                  <div role="button" tabIndex={0} onKeyDown={Util.divButtonHandler} className="fg1 no simple-center ynb" onClick={noClick}>No</div>
                 </Box>
               }}
             </MutationComponent>
         </VertBox>
       </GenericPopup>
-      <div className="simple-center setting-icon trash-box" title='Delete Group' onClick={trashClick}>
+      <button className="simple-center setting-icon trash-box button-default" title='Delete Group' onClick={trashClick} tabIndex={this.context.tabIndex}>
         <FontAwesomeIcon icon={faTrash}/>
-      </div>
+      </button>
     </>)
     
   }

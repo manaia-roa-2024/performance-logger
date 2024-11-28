@@ -4,6 +4,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faExpand, faMinus, faPen } from "@fortawesome/free-solid-svg-icons";
 import NameEditor from "./NameEditor";
 import { LogGroupContext } from "./LGContext";
+import Util from "../../../Util";
 
 interface Props{
   onClick: () => void,
@@ -48,7 +49,7 @@ context!: ContextType<typeof LogGroupContext>
         {!this.state.editingName ?
         <>
           <h4 className='group-title-box'>{this.props.groupName}</h4>
-          <div className='simple-center edit-pen' title='Edit name' onClick={penClick}>
+          <div role="button" tabIndex={0} onKeyDown={Util.divButtonHandler} className='simple-center edit-pen' title='Edit name' onClick={penClick}>
             <FontAwesomeIcon icon={faPen} fontSize={'18px'}/>
           </div>
         </>
@@ -57,7 +58,9 @@ context!: ContextType<typeof LogGroupContext>
         }
       </Box>
       
-      {this.props.open ? <Minus /> : <Expand />}
+      <button className="button-default">
+        {this.props.open ? <Minus /> : <Expand />}
+      </button>
     </Box>
   }
 }

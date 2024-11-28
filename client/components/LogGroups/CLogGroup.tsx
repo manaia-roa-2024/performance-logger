@@ -26,7 +26,7 @@ export default class CLogGroup extends Component<Props, State> {
     super(props)
 
     this.state = {
-      open: true,
+      open: false,
       lowerHeight: '0',
     }
     this.rand = Math.random()
@@ -67,14 +67,14 @@ export default class CLogGroup extends Component<Props, State> {
           if (isError || !seed)
             return <p>There was an error loading your records</p>
 
-          return <LGProvider logGroup={this.props.logGroup}>
+          return <LGProvider logGroup={this.props.logGroup} open={this.state.open}>
             <VertBox className="log-group black-border c-white">
               <LGHead onClick={() => this.headClick()} open={this.state.open} groupName={this.props.logGroup.name}/>
               <div ref={this.lowerRef} className={cls('log-lower', 'c-black', !this.state.open && 'closed')}
                 style={{ height: this.state.open ? undefined : '0' }}>
                 <Box className="log-inner">
-                  <RecordSheet logGroup={this.props.logGroup} />
                   <GroupMain/>
+                  <RecordSheet logGroup={this.props.logGroup} />
                 </Box>
               </div>
             </VertBox>
