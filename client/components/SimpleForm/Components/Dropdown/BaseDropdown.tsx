@@ -52,7 +52,6 @@ export function Dropdown({beforeDropdownClick, buttonText, children, className, 
   }
 
   const onBlur = () =>{
-    console.log('Blurry')
     setTimeout(() => setDropdownOpen(false), 100)
   }
 
