@@ -1,4 +1,4 @@
-import { Component, createRef, RefObject } from 'react'
+import { Component } from 'react'
 import { Box, VertBox } from '../Box'
 import LogGroup from '../../../models/classes/LogGroup'
 import cls from '../SimpleForm/cls'
@@ -15,11 +15,9 @@ interface Props {
 
 interface State {
   open: boolean
-  lowerHeight: string
 }
 
 export default class CLogGroup extends Component<Props, State> {
-  lowerRef: RefObject<HTMLDivElement>
   rand: number
 
   constructor(props: Props) {
@@ -27,10 +25,9 @@ export default class CLogGroup extends Component<Props, State> {
 
     this.state = {
       open: false,
-      lowerHeight: '0',
     }
+
     this.rand = Math.random()
-    this.lowerRef = createRef()
   }
 
   headClick() {
@@ -39,17 +36,6 @@ export default class CLogGroup extends Component<Props, State> {
         ...prev,
         open: !prev.open,
       }
-    })
-  }
-
-  correctLowerHeight() {
-    const element = this.lowerRef.current
-    if (!element || !element.children[0]) return
-
-    const child = element.children[0]
-    const rect = child.getBoundingClientRect()
-    this.setState((prev) => {
-      return { ...prev, lowerHeight: rect.height + 'px' }
     })
   }
 
@@ -70,8 +56,8 @@ export default class CLogGroup extends Component<Props, State> {
           return <LGProvider logGroup={this.props.logGroup} open={this.state.open}>
             <VertBox className="log-group black-border c-white">
               <LGHead onClick={() => this.headClick()} open={this.state.open} groupName={this.props.logGroup.name}/>
-              <div ref={this.lowerRef} className={cls('log-lower', 'c-black', !this.state.open && 'closed')}
-                style={{ height: this.state.open ? undefined : '0' }}>
+              <div className={cls('log-lower', 'c-black', !this.state.open && 'closed')}
+                style={{ height: this.state.open ? 'var(--log-lower-height)' : '0' }}>
                 <Box className="log-inner">
                   <GroupMain/>
                   <RecordSheet logGroup={this.props.logGroup} />

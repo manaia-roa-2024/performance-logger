@@ -17,6 +17,8 @@
   --content-children-width: 55vw;
   --content-border: 2px solid #d6d6d6;
 
+  --log-lower-height: 750px;
+
   /*record sheet*/
   --record-sheet-width: 310px;
   --record-sheet-bg: #f3f3f3;

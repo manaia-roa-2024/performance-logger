@@ -29,9 +29,40 @@ interface Props {
   logGroup: LogGroup
 }
 
-export default class RecordSheet extends Component<Props> {
+interface State{
+  lowerHeight: string
+}
+
+export default class RecordSheet extends Component<Props, State> {
   static contextType = SimpleFormInstanceContext
   context!: ISimpleFormInstanceContext<SimpleForm<object>, LogGroup>
+
+  constructor(props: Props){
+    super(props)
+
+    this.state = {
+      lowerHeight: '0'
+    }
+  }
+
+  correctLowerHeight(){
+    const dataEntryElement = document.getElementById('data-entry-' + this.props.logGroup.id)
+    if (!dataEntryElement) return
+
+    const rect = dataEntryElement.getBoundingClientRect()
+    console.log(rect.height)
+    this.setState(prev =>{
+      return {
+        ...prev,
+        lowerHeight: `calc(var(--log-lower-height) - ${rect.height}px)`
+      }
+    })
+  }
+
+  componentDidMount(): void {
+    window.addEventListener('resize', this.correctLowerHeight.bind(this))
+    this.correctLowerHeight()
+  }
 
   incrementEntryDate(incrementer: number) {
     if (!this.context.form) return
@@ -97,7 +128,7 @@ export default class RecordSheet extends Component<Props> {
           }
 
           return <div className="record-sheet">
-            <VertBox className="record-head" gap="5px">
+            <VertBox className="record-head" gap="5px" id={'data-entry-' + context.logGroup.id}>
               <h5 className="tac" style={{ fontSize: '16px' }}>
                 Data Entry
               </h5>
@@ -142,7 +173,7 @@ export default class RecordSheet extends Component<Props> {
                 <CPickOneDropdown input='graphtype-dropdown' tabIndex={context.tabIndex}/>
               </Box>
             </VertBox>
-            <VertBox className="record-lower thin-scrollbar">
+            <VertBox className="record-lower thin-scrollbar" style={{height: this.state.lowerHeight}}>
               {this.props.logGroup.groupBy === 'none' && <>
                 <Box className="record-row">
                   <div style={{cursor: 'default'}} className='record-cell trash static simple-center'>

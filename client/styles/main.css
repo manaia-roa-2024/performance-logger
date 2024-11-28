@@ -74,7 +74,7 @@ footer{
 
 .log-lower{
   background-color: #fff;
-  transition: height 0.2s;
+  transition: height 0.5s;
 }
 
 .log-lower.closed{
@@ -86,6 +86,7 @@ footer{
 
 .log-inner{
   flex-direction: row-reverse;
+  height: var(--log-lower-height)
 }
 
 .record-sheet{
@@ -101,8 +102,8 @@ footer{
 }
 
 .record-lower{
-  min-height: 150px;
-  max-height: 60vh;
+  /*min-height: 150px;
+  max-height: 60vh;*/
   overflow-y: auto;
 }
 
