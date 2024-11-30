@@ -3,7 +3,7 @@ import SimpleTimeInput from "../SimpleForm/Inputs/SimpleTimeInput";
 
 export function NumberEntry(): SimpleNumberInput{
   const entry = new SimpleNumberInput('value-entry')
-  entry.placeholder = 'New Entry'
+  entry.placeholder = 'Enter Value'
   entry.inputClass = 'entry-input entry-value'
   entry.useInputBox = false
   entry.useContainer = false

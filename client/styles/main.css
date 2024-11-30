@@ -1,3 +1,5 @@
+
+
 header{
   height: var(--header-height);
   background: var(--header-bg);
@@ -6,7 +8,9 @@ header{
 
 main{
   background: var(--main-bg);
+
   min-height: var(--main-height);
+  overflow: hidden;
 }
 
 footer{
@@ -21,7 +25,11 @@ footer{
 
 .main-content{
   background-color: var(--content-bg);
+
+  min-width: calc(50px + var(--record-sheet-width) + var(--group-main-min-width));
   width: var(--content-width);
+
+
   border-left: var(--content-border);
   border-right: var(--content-border);
   padding-top: 50px;
@@ -29,8 +37,15 @@ footer{
   margin: auto;
 }
 
+@media only screen and (max-width: 1000px) {
+  .main-content{
+    width: 90vw
+  }
+}
+
 .content-child{
   width: var(--content-children-width);
+  min-width:  calc(var(--record-sheet-width) + var(--group-main-min-width));
 }
 
 .mc-header{
@@ -42,7 +57,9 @@ footer{
 }
 
 .green-button{
-  background-color: #bef1c4;
+  background-color: var(--header-bg);
+  color: rgb(241, 241, 241);
+  font-weight: 600;
   padding: 10px;
   border: 1px solid rgb(167, 167, 167);
   border-radius: 5px;
@@ -50,11 +67,11 @@ footer{
 }
 
 .green-button:hover {
-  background-color: #95eba0;
+  background-color: #68b371;
 }
 
 .green-button:active {
-  background-color: #6ce47c;
+  background-color: rgb(80, 172, 92);
 }
 
 .log-group{
@@ -109,6 +126,12 @@ footer{
 
 .entry-row{
   gap: var(--record-entry-gap)
+}
+
+.entry-row.top{
+  border-bottom: 2px solid var(--record-sheet-border-color);
+  padding-bottom: 10px;
+  margin-bottom: 8px;
 }
 
 .record-row{
@@ -316,6 +339,7 @@ footer{
 
 .group-main{
   padding: 10px 0;
+  min-width: var(--group-main-min-width);
 }
 
 .gm-content{
@@ -407,4 +431,12 @@ dialog:focus-visible{
   display: flex;
   gap: 5px;
   flex-direction: column;
+}
+
+.record-row.focused > .record-cell:last-child{
+  border: 2px solid #67acf3;
+}
+
+.record-row.invalid > .record-cell:last-child{
+  border: 2px solid red !important;
 }

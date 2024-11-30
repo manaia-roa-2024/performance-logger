@@ -85,13 +85,13 @@ export const MetricHandler = (function(){
   const currency = new Metric('$', 'Currency')
   const dollars = currency.units.set('$', new BaseUnit(currency, 'Dollars', '$'))
                   .get('$') as BaseUnit
-  dollars.converters.set('$', UnitConverters.Identity.fromBase)
+  dollars.converters.set('$', UnitConverters.$.fromBase)
 
   const unit = new Metric('unit', 'Unit')
   const baseUnit = unit.units.set('unit', new BaseUnit(unit, 'Unit', 'units')).get('unit') as BaseUnit
   baseUnit.converters.set('unit', UnitConverters.Identity.fromBase)
 
-  builder.metrics.set('length', length).set('mass', mass).set('unit', unit).set('time', time).set('currency', currency)
+  builder.metrics.set('length', length).set('mass', mass).set('time', time).set('currency', currency).set('unit', unit)
   
   const convertTo = function(fromMetricCode: string, fromUnitCode: string, toMetricCode: string, toUnitCode: string, value: string, dp: number = 4){
 
@@ -114,7 +114,8 @@ export const MetricHandler = (function(){
     const converterFn = toMetric.getBase().converters.get(toUnitCode)!
 
     const final = converterFn(baseValue)
-    if (final !== '' && !isNaN(Number(final)))
+
+    if (toMetricCode !== 'currency' && final !== '' && !isNaN(Number(final)))
       return roundToX(Number(final), dp).toString()//Number(final).toFixed(dp)
     return final
   }

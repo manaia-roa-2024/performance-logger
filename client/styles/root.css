@@ -34,4 +34,6 @@
   --record-entry-height: 30px;
   --record-entry-gap: 6px;
   --record-entry-items: 3;
+
+  --group-main-min-width: 400px;
 }

@@ -11,10 +11,10 @@ import { ISimpleFormInstanceContext, SimpleFormInstanceContext } from '../Simple
 import LogGroup from '../../../models/classes/LogGroup'
 import SimpleForm from '../SimpleForm/Form/SimpleForm'
 import { MetricHandler } from '../../../models/classes/MetricHandler'
-import SimpleTextInput from '../SimpleForm/Inputs/SimpleTextInput'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faTrash } from '@fortawesome/free-solid-svg-icons'
 import Util from '../../../Util'
+import SimpleKeyboardInput from '../SimpleForm/Inputs/SimpleKeyboardInput'
 
 interface Props{
   logRecord: LogRecord
@@ -48,8 +48,16 @@ export class CLogRecord extends Component<Props, State> {
     }
   }
 
+  getRecordInput(){
+    const input = this.context.form.getInput(this.recordId) as SimpleKeyboardInput | undefined
+    if (!input)
+      throw new Error("Could not find input for id of " + this.recordId)
+    return input
+  }
+
   render() {
     const record = this.props.logRecord
+    const recordInput = this.getRecordInput()
 
     return (
       <Mutations>
@@ -70,14 +78,13 @@ export class CLogRecord extends Component<Props, State> {
         
             const onBlur = () =>{
               const startValue = record.getConvertedValue()
-              console.group("Cell Values")
-              console.log("Initial Value:", startValue)
 
-              const input = this.context.form.getInput(this.recordId)! as SimpleTextInput
+              const input = recordInput
               const baseValue = MetricHandler.convertToBase(record.logGroup.metric, record.logGroup.unit, input.value!)
-              console.log('Input value:', input.value)
-              console.log('Base Value:', baseValue)
-              console.groupEnd()
+
+              this.setState(prev =>{
+                return {...prev, recordFocused: false}
+              })
 
               if (startValue === input.value)
                 return
@@ -88,10 +95,6 @@ export class CLogRecord extends Component<Props, State> {
               }
 
               modify.mutate({id: record.id, value: baseValue})
-
-              this.setState(prev =>{
-                return {...prev, recordFocused: false}
-              })
             }
         
             const onEnter = () =>{
@@ -101,17 +104,25 @@ export class CLogRecord extends Component<Props, State> {
             return (
               <LogGroupContext.Consumer>
                 {(context: ILogGroupContext) =>{
+
+                  const baseValue = MetricHandler.convertToBase(context.logGroup.metric, context.logGroup.unit, recordInput.value!)
+
+                  let cellTitle: string | undefined = undefined
+                  if (baseValue == null)
+                    cellTitle = 'Value is invalid'
+                  else if (!this.state.recordFocused)
+                    cellTitle = 'Edit Record'
                   
-                  return <Box className={cls("record-row", this.state.recordFocused && 'focused', this.props.logRecord.freshlyAdded && 'freshly-added')}>
+                  return <Box className={cls("record-row", this.state.recordFocused && 'focused', this.props.logRecord.freshlyAdded && 'freshly-added', baseValue == null && 'invalid')}>
                     <div tabIndex={context.tabIndex} role="button" onKeyDown={Util.divButtonHandler} className='record-cell trash static simple-center' title='Delete Record' onClick={() => remove.mutate(this.props.logRecord.id)}>
                       
                       <FontAwesomeIcon icon={faTrash}/>
                     </div>
                     <div className="record-cell static df aic">
-                      {this.props.logRecord.date}
+                      {LogGroup.standardDate(this.props.logRecord.date)}
                     </div>
                     <div className="record-cell df aic">
-                      <CTextInput input={'record-input-' + this.props.logRecord.id} onEnter={onEnter} onKeyDown={keyDown} onFocus={onFocus} onBlur={onBlur} tabIndex={context.tabIndex}/>
+                      <CTextInput input={'record-input-' + this.props.logRecord.id} title={cellTitle} onEnter={onEnter} onKeyDown={keyDown} onFocus={onFocus} onBlur={onBlur} tabIndex={context.tabIndex}/>
                     </div>
                   </Box>
                 }}

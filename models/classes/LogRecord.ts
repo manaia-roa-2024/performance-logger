@@ -60,6 +60,9 @@ export default class LogRecord implements ILogRecord{
     return 'record-input-' + this.id
   }
 
+  getStandardDate(){ // get the date of record and convert to consistent format use throughout application.
+  }
+
   static getSorter(order: Order = "desc"){
     return function(a: {date: string}, b: {date: string}){
       const d1 = new Date(a.date)

@@ -50,7 +50,7 @@ export default class RecordSheet extends Component<Props, State> {
     if (!dataEntryElement) return
 
     const rect = dataEntryElement.getBoundingClientRect()
-    console.log(rect.height)
+
     this.setState(prev =>{
       return {
         ...prev,
@@ -79,14 +79,12 @@ export default class RecordSheet extends Component<Props, State> {
     const validRgx: RegExp = (valueEntry instanceof SimpleNumberInput) ? valueEntry.validNumReg : valueEntry.validTimeReg
 
     if (valueEntry.value == null || valueEntry.value === '' || !validRgx.test(valueEntry.value)){
-      //console.error("Invalid entry from the get go")
       return null
     }
 
     const converted = MetricHandler.convertToBase(lg.metric, lg.unit, valueEntry.value)
 
     if (converted == null){
-      //console.error("Conversion fail")
       return null
     }
 
@@ -132,7 +130,7 @@ export default class RecordSheet extends Component<Props, State> {
               <h5 className="tac" style={{ fontSize: '16px' }}>
                 Data Entry
               </h5>
-              <Box className="aic entry-row">
+              <Box className="aic entry-row top">
                 <Box className="date-caret-box">
                   <Caret
                     left={true}

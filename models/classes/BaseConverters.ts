@@ -1,3 +1,5 @@
+import roundToX from "../../client/roundToX"
+
 const basic = (x: string, fn: (n: number) => number) =>{
   const n = Number(x)
     return x === '' || isNaN(n) ? null : fn(n) 
@@ -9,6 +11,9 @@ const UnitConverters = {
   Identity: {
     toBase: (x: string) => basic(x, n => n),
     fromBase: (n: number) => n.toString()
+  },
+  $:{
+    fromBase: (n: number) => roundToX(n, 2).toFixed(2)
   },
   cm: {
     toBase: (x: string) => basic(x, n => n / 100),

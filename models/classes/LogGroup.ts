@@ -1,3 +1,4 @@
+import { format } from "date-fns";
 import Util from "../../Util";
 import { Order } from "../Order";
 import LogRecord, { ILogRecord } from "./LogRecord";
@@ -255,5 +256,15 @@ export default class LogGroup implements ILogGroup{
       const d2 = new Date(b.created!)
       return order === "asc" ? (d1.getTime() - d2.getTime()) : (d2.getTime() - d1.getTime())
     }
+  }
+
+  static standardDate(date: Date | string){
+    let da: Date
+    if (typeof(date) === 'string')
+      da = new Date(date)
+    else
+      da = date
+
+    return format(da, 'dd-MM-yyyy')
   }
 }

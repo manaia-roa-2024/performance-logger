@@ -19,13 +19,6 @@ const chars = (function(){
 function randomChar(start: number, end=chars.length){
   const rand = Math.random()
   const char = chars[Math.floor(rand * (end-start)) + start]
-  if (!char){
-    console.group('DEBUG')
-    console.log('start: ', start)
-    console.log('end: ', end)
-    console.log('rand: ', rand)
-    console.groupEnd()
-  }
   
   return char
 }

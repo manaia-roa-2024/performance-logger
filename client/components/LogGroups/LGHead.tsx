@@ -44,7 +44,7 @@ context!: ContextType<typeof LogGroupContext>
       this.toggleEditingStatus(true)
     }
 
-    return <Box className="log-group-head cp aic" onClick={this.props.onClick} gap='100px'>
+    return <Box className="log-group-head cp aic" onClick={this.props.onClick} title={this.props.open ? 'Minimize' : 'Expand'} gap='100px'>
       <Box className="fg1 aic" gap='20px'>
         {!this.state.editingName ?
         <>

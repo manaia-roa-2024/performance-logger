@@ -1,8 +1,9 @@
 import { Component, ContextType, ReactNode } from "react"
 import CanvasJSReact from '@canvasjs/react-charts'
 import { LogGroupContext } from "../LGContext";
-import SimpleDateInput from "../../SimpleForm/Inputs/SimpleDateInput";
 import Util from "../../../../Util";
+import LogGroup from "../../../../models/classes/LogGroup";
+import { format, parseISO } from "date-fns";
 
 const CanvasJSChart = CanvasJSReact.CanvasJSChart;
 
@@ -26,18 +27,52 @@ export default class Graphs extends Component{
     this.removeCanvasJSLink()
   }
 
+  //1743375600000 max
+  //1732921200000 min
+
+  emptyGraph(){
+    const options = {
+      theme: "light2",
+      title: {
+          text: "Trend"
+      },
+      axisY: {
+        title: this.context.logGroup.getYLabel(),
+      },
+      axisX: {
+        title: 'Date',
+      },
+      data: [{type: 'line',
+        xValueFormatString: "MMM YYYY",
+        yValueFormatString: "#,##0.00",}]
+    }
+    return options
+  }
+
   completeLineGraph(){ // line graph using all data points
     const logGroup = this.context.logGroup
 
-    const dataPoints = logGroup.logRecords.map(lr =>{
-      const date = new Date(lr.date)
+    if (logGroup.logRecords.length === 0)
+      return this.emptyGraph()
+
+
+    let totalUnits: number = 1
+
+    const lastMs = new Date(logGroup.logRecords[0].date).getTime() + 8.64e+7
+    const firstMs = new Date(logGroup.logRecords[logGroup.logRecords.length-1].date).getTime() - 8.64e+7
+    totalUnits = (lastMs - firstMs) / 1000 / 60 / 60 / 24
+
+    const interval = Math.ceil(totalUnits / 5)
+
+    const dataPoints = logGroup.logRecords.map((lr, i) =>{
+      const date = parseISO(lr.date)
       const x = date
       const y = Number(lr.getLineGraphValue())
-      const toolTipContent = `<span data-color="#6D78AD" style="color:rgb(109,120,173);">${SimpleDateInput.toISODate(date)}:</span>&nbsp;&nbsp;${lr.getConvertedValue()}`
+      const toolTipContent = `<span data-color="#6D78AD" style="color:rgb(109,120,173);">${LogGroup.standardDate(date)}:</span>&nbsp;&nbsp;${lr.logGroup.getConvertedValueBlacklist(lr.value)}`
       return {
         x,
         y,
-        label: SimpleDateInput.toISODate(date),
+        /*label: format(date, 'MMM dd yyyy'),*/
         indexLabel: undefined,
         toolTipContent: toolTipContent,
       }
@@ -55,15 +90,19 @@ export default class Graphs extends Component{
         }
       },
       axisX: {
-        title: 'Date'
+        title: 'Date',
+        labelFormatter: function(e){
+          if (e.value instanceof Date){
+            return format(e.value, 'dd MMM yyyy')
+          }
+        },
+        minimum: firstMs,
+        maximum: lastMs,
+        intervalType: 'day',
+        interval: interval,//Math.max(Math.floor(logGroup.logRecords.length / 5), 1),
+        labelAngle: -30
       },
-      /*toolTip:{
-        contentFormatter: function(e){
-          const str = ""
-          console.log(e)
-          return 'abc'
-        }
-      },*/
+
       data: [{
           type: logGroup.graphType,
           xValueFormatString: "MMM YYYY",
@@ -99,7 +138,7 @@ export default class Graphs extends Component{
         : `${gd.dateStart} to ${gd.dateEnd}`*/
 
       const monthText = Util.toMonthAndYear(ds)
-      const rangeStr = logGroup.groupBy === 'month' ? monthText : `${gd.dateStart}&nbsp;&nbsp;to&nbsp;&nbsp;${gd.dateEnd}`
+      const rangeStr = logGroup.groupBy === 'month' ? monthText : `${LogGroup.standardDate(ds)}&nbsp;&nbsp;to&nbsp;&nbsp;${LogGroup.standardDate(de)}`
 
       const toolTipContent = 
       `
