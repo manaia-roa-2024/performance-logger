@@ -70,8 +70,8 @@ async function loadSnapshot(fileName: string): Promise<Snapshot>{
 
 
 snapshotRouter.get('/', async (req, res) =>{
-  const snap = await createSnapshot()
-  res.json(snap)
+  await createSnapshot()
+  res.sendStatus(200)
 })
 
 interface ILoadSnapshot{

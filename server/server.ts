@@ -21,6 +21,7 @@ server.post('/test', BodyValidator.CreateLogGroup, async (req, res) =>{
 })
 
 server.post('/api/v1/reset', async (req, res) =>{
+  if (req.body.password !== 'perf-log-123') res.status(403).send("No")
   await seed(connection)
   res.send("DB Reset")
 })
@@ -30,7 +31,7 @@ server.use(errorHandler)
 if (process.env.NODE_ENV === 'production') {
   server.use(express.static(Path.resolve('public')))
   server.use('/assets', express.static(Path.resolve('./dist/assets')))
-  server.get('*', (req, res) => {
+  server.get('/*wildcard', (req, res) => {
     res.sendFile(Path.resolve('./dist/index.html'))
   })
 }

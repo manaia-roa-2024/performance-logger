@@ -61,6 +61,7 @@ router.patch('/logrecord/:id', BodyValidator.EditLogRecord, async (req, res) =>{
 })
 
 router.delete('/deleteall', async (req, res) =>{
+  if (req.body.password !== 'perf-log-123') res.status(403).send("No")
   await connection('logRecord').delete()
   await connection('logGroup').delete()
   res.sendStatus(200)
