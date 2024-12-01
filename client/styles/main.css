@@ -226,6 +226,26 @@ footer{
   border-bottom: var(--record-sheet-border);
 }
 
+.ystat-dropdown{
+  width: 100%;
+  align-self: stretch;
+}
+
+.ystat-dropdown > .sf-dropdown-button{
+  border: 0;
+  height: 100%;
+  background-color: transparent;
+  border-bottom: var(--record-sheet-border);
+  border-radius: 0;
+}
+
+.ystat-dropdown > .sf-dropdown-content{
+  
+  border-left: var(--record-sheet-border);
+  border-right: var(--record-sheet-border);
+  border-bottom: var(--record-sheet-border);
+}
+
 .sf-dropdown-option{
   padding: 2px 5px;
   cursor: pointer;

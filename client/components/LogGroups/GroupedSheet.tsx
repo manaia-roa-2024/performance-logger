@@ -3,6 +3,7 @@ import { ILogGroupContext, LogGroupContext } from "./LGContext";
 import { GroupStats } from "../../../models/classes/LogGroup";
 import { Box } from "../Box";
 import Util from "../../../Util";
+import CPickOneDropdown from "../SimpleForm/Components/CPickOneDropdown";
 
 export default class GroupedSheet extends Component{
   static contextType = LogGroupContext;
@@ -14,8 +15,8 @@ export default class GroupedSheet extends Component{
         <div className="record-cell group-cell static df aic bold">
           {gb[0].toUpperCase() + gb.slice(1)}
         </div>
-        <div className="record-cell group-cell static df aic bold">
-          Average
+        <div style={{border: '0'}} className="record-cell group-cell df aic bold">
+          <CPickOneDropdown input='ystat-dropdown'/>
         </div>
       </Box>
       {
@@ -40,7 +41,7 @@ class GroupRecord extends Component<Props>{
         {this.props.groupIndex}
       </div>
       <div className="record-cell group-cell static df aic">
-        {this.context.logGroup.getConvertedValue(this.props.data.mean!)}
+        {this.context.logGroup.yStat === 'records' ? this.props.data[this.context.logGroup.yStat]! : this.context.logGroup.getConvertedValue(this.props.data[this.context.logGroup.yStat]!)}
       </div>
     </Box>
   }

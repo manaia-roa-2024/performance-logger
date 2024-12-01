@@ -19,6 +19,12 @@ export default class LogGroupPanel extends Component{
 
             if (isError || !logGroups) return <p>There was an error loading your records</p>
 
+            if (logGroups.length === 0)
+              return <VertBox className='fg1 aic' gap='5px'>
+                <p>There are no performance groups at the moment</p>
+                <p>Click {'"Add New Group"'} to begin</p>
+              </VertBox>
+
             return <VertBox gap="40px">
               {logGroups.map((group) => {
                 return <CLogGroup key={group.id} logGroup={group} />

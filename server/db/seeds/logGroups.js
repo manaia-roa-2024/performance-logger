@@ -31,6 +31,13 @@ const groups = [
     unit: 'unit',
     created: rdt()
   },
+  {
+    id: 4,
+    name: 'Spending Log',
+    metric: 'currency',
+    unit: '$',
+    created: rdt()
+  }
 ]
 
 const groupById = (id) =>{
@@ -39,11 +46,12 @@ const groupById = (id) =>{
 
 const RecordBuilders = {
   'Weight Log': () => [],
-  '5k Run': () => generateRandomRecords(2, 49, 1300, -15, 10),
-  'Steps Log': () => generateRandomRecords(3, 350, 7500, -50, 70) 
+  '5k Run': () => generateRandomRecords(2, 49, 1300, -15, 10, true),
+  'Steps Log': () => generateRandomRecords(3, 350, 7500, -50, 70, true),
+  'Spending Log': () => generateRandomRecords(4, 365, 70, -0.5, 0.5, false)
 }
 
-function generateRandomRecords(groupId, n, seedValue, deltaMin, deltaMax){
+function generateRandomRecords(groupId, n, seedValue, deltaMin, deltaMax, integer){
   const group = groupById(groupId)
   const records = []
 
@@ -53,7 +61,7 @@ function generateRandomRecords(groupId, n, seedValue, deltaMin, deltaMax){
     const prev = records[i-1]?.value ?? seedValue
     startDate.setDate(startDate.getDate() + 1)
     records.push({
-      value: prev + (Math.random() * (deltaMax-deltaMin) + deltaMin),
+      value: integer ? Math.round(prev + (Math.random() * (deltaMax-deltaMin) + deltaMin)) : prev + (Math.random() * (deltaMax-deltaMin) + deltaMin),
       date: Util.toISODate(startDate),
       created: rdt(new Date(group.created)),
       logGroupId: groupId

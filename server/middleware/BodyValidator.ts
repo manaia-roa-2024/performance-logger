@@ -39,7 +39,7 @@ const CreateLogGroup: RequestHandler = function(req, res, next){
   if (!dto || typeof(dto) !== 'object')
     throw ProblemDetails.UserError('Expected an object')
 
-  cna(dto, 'name', 'metric', 'unit', 'groupBy', 'graphType') // check that all the following properties are not null
+  cna(dto, 'name', 'metric', 'unit', 'groupBy', 'graphType', 'yStat') // check that all the following properties are not null
 
   ct('name', dto.name, 'string')
 
@@ -55,6 +55,9 @@ const CreateLogGroup: RequestHandler = function(req, res, next){
   if (!LogGroup.GraphTypes.has(dto.graphType))
     throw ProblemDetails.PropertyError('graphType', `Invalid graphType of ${dto.graphType}`)
 
+  if (!LogGroup.GroupStats.has(dto.yStat))
+    throw ProblemDetails.PropertyError('graphType', `Invalid yStat of ${dto.yStat}`)
+
   req.body.name = Util.formatText(req.body.name)
 
   if (req.body.name.length < 1 || req.body.name.length > 32)
@@ -63,7 +66,7 @@ const CreateLogGroup: RequestHandler = function(req, res, next){
   next()
 }
 
-const mutableGroupProperties = new Set(['name', 'metric', 'unit', 'groupBy', 'graphType'])
+const mutableGroupProperties = new Set(['name', 'metric', 'unit', 'groupBy', 'graphType', 'yStat'])
 const mutableRecordProperties = new Set(['date', 'value'])
 
 function createMutateObj(mutateSet: Set<string>, obj: Dict){
@@ -97,6 +100,9 @@ const EditLogGroup: RequestHandler = function(req, res, next){
 
   if (dto.graphType != null && !LogGroup.GraphTypes.has(dto.graphType))
     throw ProblemDetails.PropertyError('graphType', `Invalid graphType of ${dto.graphType}`)
+
+  if (dto.yStat != null && !LogGroup.GroupStats.has(dto.yStat))
+    throw ProblemDetails.PropertyError('graphType', `Invalid yStat of ${dto.yStat}`)
 
   if (dto.name != null){
     req.body.name = Util.formatText(req.body.name)

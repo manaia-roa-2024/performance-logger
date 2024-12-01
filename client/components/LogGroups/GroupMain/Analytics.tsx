@@ -18,7 +18,7 @@ export default class Analytics extends Component{
     let diff: string | number = 'N/A'
     if (gd.length > 0){
       diff = (gd[0].mean! - gd[gd.length - 1].mean!) / (gd.length - 1)
-      diff = group.getConvertedValueBlacklist(diff)
+      diff = (group.metric === 'time' && diff < 0 ? '-' : '') + group.getConvertedValueBlacklist(diff)
     }
 
     return <div className="gm-content">

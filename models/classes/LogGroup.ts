@@ -3,6 +3,7 @@ import Util from "../../Util";
 import { Order } from "../Order";
 import LogRecord, { ILogRecord } from "./LogRecord";
 import { MetricHandler } from "./MetricHandler";
+import roundToX from "../../client/roundToX";
 
 export type GroupBy = 'none' | 'week' | 'month'
 
@@ -12,6 +13,7 @@ export interface PartialLogGroup{
   unit: string
   groupBy: GroupBy
   graphType: 'line' | 'column'
+  yStat: YStat
 }
 
 export interface ILogGroup extends PartialLogGroup{
@@ -25,6 +27,7 @@ export interface RecordStats{
   median: number | null
   max: number | null
   min: number | null
+  total: number | null
   [key: string]: number | null
 }
 
@@ -34,6 +37,7 @@ export interface GroupPeriod{
   median: number
   max: number
   min: number
+  total: number
   //dateEnd: string
 }
 
@@ -41,11 +45,17 @@ type AllString<T> = {
   [key in keyof T]: string
 }
 
+export type YStat = 'records' | 'mean' | 'median' | 'max' | 'min' | 'total'
+
 export type GroupStats = RecordStats &{
   dateStart: string
   dateEnd: string
 }
 
+export interface GroupStatsMapValue{
+  alias: string,
+  yLabel: string
+}
 /*
 
 - Adding groups: create group from json, add to queryCache
@@ -60,6 +70,14 @@ export default class LogGroup implements ILogGroup{
   static GroupByOptions = new Set<string>(['none', 'week', 'month'])
   static GraphTypes = new Set(['line', 'column'])
   static UnitBlacklist = new Set(['unit', 'duration'])
+  static GroupStats = new Map<string, GroupStatsMapValue>([
+    ['records', {alias: "Records", yLabel: '{P} Records'}], 
+    ['mean', {alias: "Average", yLabel: 'Average {P} {L}'}],
+    ['median', {alias: "Median", yLabel: 'Median {P} {L}'}],
+    ['max', {alias: "Max", yLabel: 'Max {P} {L}'}],
+    ['min', {alias: "Min", yLabel: 'Min {P} {L}'}],
+    ['total', {alias: "Total", yLabel: 'Total {P} {L}'}]
+  ])
   //db
   id: number
   name: string
@@ -67,7 +85,8 @@ export default class LogGroup implements ILogGroup{
   unit: string
   created: string
   groupBy: GroupBy;
-  graphType: "line" | "column";
+  graphType: "line" | "column"
+  yStat: YStat
 
   // entities
   logRecords: LogRecord[]
@@ -80,6 +99,7 @@ export default class LogGroup implements ILogGroup{
     this.created = json.created
     this.groupBy = json.groupBy
     this.graphType = json.graphType
+    this.yStat = json.yStat
     
     this.logRecords = []
   }
@@ -92,6 +112,7 @@ export default class LogGroup implements ILogGroup{
     this.created = json.created
     this.groupBy = json.groupBy
     this.graphType = json.graphType
+    this.yStat = json.yStat
   }
 
   addJsonRecord(json: ILogRecord){
@@ -128,7 +149,8 @@ export default class LogGroup implements ILogGroup{
       max: values[values.length - 1],
       median,
       mean: values.length === 0 ? null : total / values.length,
-      records: values.length
+      records: values.length,
+      total
     } as RecordStats
 
     const formattedStats: AllString<RecordStats> = {
@@ -136,7 +158,8 @@ export default class LogGroup implements ILogGroup{
       max: '',
       median: '',
       mean: '',
-      records: ''
+      records: '',
+      total: ''
     }
 
     for (const key in preliminary){
@@ -207,7 +230,7 @@ export default class LogGroup implements ILogGroup{
       case 'duration':
         return MetricHandler.convertFromBase(this.metric, this.unit, graphValue)
     }
-    return graphValue
+    return roundToX(graphValue, 4)
   }
 
   sortRecords(){

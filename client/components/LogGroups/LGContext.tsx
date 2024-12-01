@@ -1,5 +1,5 @@
 import React, { ContextType } from "react"
-import LogGroup, { GroupBy, GroupStats, ILogGroup } from "../../../models/classes/LogGroup"
+import LogGroup, { GroupBy, GroupStats, ILogGroup, YStat } from "../../../models/classes/LogGroup"
 import { ReactNode } from "react"
 import SimpleForm, { FormBuilder } from "../SimpleForm/Form/SimpleForm"
 import SimpleDateInput from "../SimpleForm/Inputs/SimpleDateInput"
@@ -17,6 +17,7 @@ import { NumberEntry, TimeEntry } from "../InputTemplates/Entries"
 import { SimpleNumberInput } from "../SimpleForm/Inputs/SimpleNumberInput"
 import groupByDropdown from "../InputTemplates/GroupByDropdown"
 import GraphTypeDropdown from "../InputTemplates/GraphTypeDropdown"
+import YDrop from "../InputTemplates/YDrop"
 
 export interface ILogGroupContext {
   logGroup: LogGroup,
@@ -97,12 +98,14 @@ export class LGProvider extends React.Component<Props>{
       
       const graphDrop = GraphTypeDropdown(logGroup)
 
+      const yDrop = YDrop(logGroup)
+
       for (const logRecord of logGroup.logRecords) {
         form.addInput(CellInput(logRecord))
       }
       this.updateCellValues(logGroup, form)
 
-      form.addInputs(nameInput, dateEntry, valueEntry, metricDropdown, unitDropdown, groupByDrop, graphDrop)
+      form.addInputs(nameInput, dateEntry, valueEntry, metricDropdown, unitDropdown, groupByDrop, graphDrop, yDrop)
     }
   }
 
@@ -132,6 +135,10 @@ export class LGProvider extends React.Component<Props>{
 
   getForm(){
     return this.context.getForm(this.logGroup.formId())! as SimpleForm<object>
+  }
+
+  getYDrop(){
+    return this.getForm().getInput('ystat-dropdown') as PickOneDropdownInput
   }
 
   getMetricDropdown(){
@@ -164,6 +171,10 @@ export class LGProvider extends React.Component<Props>{
 
   dropdownGraphType(){
     return this.getGraphTypeDropdown().getSelectedOption()?.key as 'line' | 'column'
+  }
+
+  yStat(){
+    return this.getYDrop().getSelectedOption()?.key as YStat
   }
 
   render(): ReactNode {
@@ -248,7 +259,8 @@ export class LGProvider extends React.Component<Props>{
                       metric: this.dropdownMetric(),
                       unit: this.dropdownUnit(),
                       groupBy: this.dropdownGroupBy(),
-                      graphType: this.dropdownGraphType()
+                      graphType: this.dropdownGraphType(),
+                      yStat: this.yStat()
                     }, this.logGroup.id)
                   }
 
@@ -261,6 +273,7 @@ export class LGProvider extends React.Component<Props>{
                       const ud = this.getUnitDropdown()
                       const gd = this.getGroupByDropdown()
                       const gt = this.getGraphTypeDropdown()
+                      const ys = this.getYDrop()
                       md.updateValue = (newValue: number) =>{
                         md.value = newValue
                         const met = md.getSelectedOption()!.key
@@ -289,6 +302,12 @@ export class LGProvider extends React.Component<Props>{
                         gt.value = newValue
                         mutate()
                         gt.reload()
+                      }
+
+                      ys.updateValue = (newValue: number) =>{
+                        ys.value = newValue
+                        mutate()
+                        ys.reload()
                       }
       
                       return this.props.children

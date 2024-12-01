@@ -12,7 +12,8 @@ export default class AddGroupButton extends Component {
       metric: 'length',
       unit: 'M',
       groupBy: 'none',
-      graphType: 'line'
+      graphType: 'line',
+      yStat: 'mean'
     })
 
     const onSuccess = (json: ILogGroup, queryClient: QueryClient) =>{

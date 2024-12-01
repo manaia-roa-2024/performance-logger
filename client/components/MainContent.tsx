@@ -15,14 +15,14 @@ export default class MainContent extends Component {
         <ContentChild className="simple-center mc-header">
           <h1>Track your performance</h1>
         </ContentChild>
-        <VertBox gap="40px">
+        <VertBox gap="40px" className='fg1'>
           <ContentChild>
             <VertBox gap="15px">
               <AddGroupButton/>
               <div className="separator"></div>
             </VertBox>
           </ContentChild>
-          <ContentChild>
+          <ContentChild className='fg1 df vert-flex'>
             <LogGroupPanel />
           </ContentChild>
         </VertBox>

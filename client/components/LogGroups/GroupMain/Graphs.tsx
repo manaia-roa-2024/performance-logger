@@ -121,8 +121,8 @@ export default class Graphs extends Component{
     const dataPoints = this.context.groupData.map((gd, i, arr) =>{
       //const mean = Number(gd.mean.split(' ')[0])
       const x = arr.length - i
-      const y = logGroup.getLineGraphValue(gd.mean!)
-
+      const keyStatValue = gd[logGroup.yStat]!
+      const y = logGroup.yStat === 'records' ? gd.records : logGroup.getLineGraphValue(keyStatValue)
       const toolTipRow = (key: string, value: string | number) =>{
         return `
         <div class="tool-tip-row">
@@ -152,6 +152,7 @@ export default class Graphs extends Component{
         ${toolTipRow('Median', logGroup.getConvertedValueBlacklist(gd.median!))}
         ${toolTipRow('Min', logGroup.getConvertedValueBlacklist(gd.min!))}
         ${toolTipRow('Max', logGroup.getConvertedValueBlacklist(gd.max!))}
+        ${toolTipRow('Total', logGroup.getConvertedValueBlacklist(gd.total!))}
       </div>
       
       `;
@@ -168,8 +169,8 @@ export default class Graphs extends Component{
     let max = Number.MIN_SAFE_INTEGER
 
     for (const gd of this.context.groupData){
-      min = Math.min(min, gd.mean!)
-      max = Math.max(max, gd.mean!)
+      min = Math.min(min, gd[logGroup.yStat]!)
+      max = Math.max(max, gd[logGroup.yStat]!)
     }
     min = logGroup.getLineGraphValue(min)
     max = logGroup.getLineGraphValue(max)
@@ -177,16 +178,20 @@ export default class Graphs extends Component{
     const minimum = min - Math.abs(0.025 * min)
    // const maximum = logGroup.getLineGraphValue(max)
 
+   const period = logGroup.groupBy === 'month' ? 'Monthly' : 'Weekly'
+
+    const title = LogGroup.GroupStats.get(logGroup.yStat)!.yLabel.replace('{P}', period).replace('{L}', logGroup.getYLabel()!)
 
     const options = {
       theme: "light2",
       title: {
-        text: "Trend"
+        text: "Trend",
       },
       axisY: {
-        title: 'Average ' + logGroup.getYLabel(),
+        title: title,
+        titleFontSize: title.length > 26 ? 18 : 20,
         labelFormatter: (e: {value: number}) =>{
-          return logGroup.convertGraphValue(e.value)
+          return logGroup.yStat === 'records' ? e.value : logGroup.convertGraphValue(e.value)
         },
         minimum: this.context.groupData.length > 0 ? minimum : undefined,
       },
