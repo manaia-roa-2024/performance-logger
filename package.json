@@ -27,9 +27,12 @@
     ]
   },
   "dependencies": {
+    "@auth0/auth0-react": "^2.2.4",
     "@canvasjs/react-charts": "^1.0.2",
     "date-fns": "^4.1.0",
     "express": "^5.0.0",
+    "express-jwt": "^8.4.1",
+    "jwks-rsa": "^3.1.0",
     "knex": "^2.5.1",
     "sqlite3": "^5.1.6",
     "superagent": "^8.1.2"

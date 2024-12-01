@@ -460,3 +460,47 @@ dialog:focus-visible{
 .record-row.invalid > .record-cell:last-child{
   border: 2px solid red !important;
 }
+
+.login-page{
+  background-color: var(--header-bg);
+}
+
+.login-box{
+  min-width: 300px;
+  min-height: 200px;
+  padding: 35px;
+  background-color: white;
+  border-radius: 25px;
+}
+
+.login-button{
+  font-size: 23px;
+  padding: 10px 30px;
+  cursor: pointer;
+}
+
+.logout-button{
+  font-size: 20px;
+  padding: 12px;
+  border-radius: 10px;
+  background-color: white;
+  border: 1px solid grey;
+  cursor: pointer;
+}
+
+.logout-button:hover{
+  background-color: rgb(241, 243, 137);
+}
+
+.logout-button:active{
+  background-color: rgb(223, 224, 115);
+}
+
+.sec-inner{
+  padding: 0 200px;
+}
+
+.sec3{
+  flex-direction: row-reverse;
+  flex: 1 1 0;
+}
