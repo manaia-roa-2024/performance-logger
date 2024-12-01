@@ -16,7 +16,7 @@ export default class GroupedSheet extends Component{
           {gb[0].toUpperCase() + gb.slice(1)}
         </div>
         <div style={{border: '0'}} className="record-cell group-cell df aic bold">
-          <CPickOneDropdown input='ystat-dropdown'/>
+          <CPickOneDropdown input='ystat-dropdown' tabIndex={this.context.tabIndex}/>
         </div>
       </Box>
       {
