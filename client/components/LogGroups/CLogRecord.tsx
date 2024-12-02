@@ -145,14 +145,14 @@ function Mutations(props: MutationsProps){
   const context = useContext(LogGroupContext)
 
   const remove = useMutation({
-    mutationFn: (id: number) => deleteRecord(id),
+    mutationFn: async (id: number) => deleteRecord(id, await context.getAccessTokenSilently()),
     onSuccess: (id: number) => {
       context.deleteExistingLogRecord(id)
     }
   })
   const modify = useMutation({
-    mutationFn: ({id, value}: {id: number, value: number}): Promise<ILogRecord> => {
-      const result = request.patch('/api/v1/logrecord/' + id).send({value}).then(res =>{
+    mutationFn: async ({id, value}: {id: number, value: number}): Promise<ILogRecord> => {
+      const result = request.patch('/api/v1/logrecord/' + id).set('Authorization', `Bearer ${await context.getAccessTokenSilently()}`).send({value}).then(res =>{
         return res.body as ILogRecord
       })
       return result

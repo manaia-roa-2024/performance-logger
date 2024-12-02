@@ -3,18 +3,22 @@ import MutationComponent from './MutationComponent'
 import addLogGroup from '../apis/addLogGroup'
 import LogGroup, { ILogGroup } from '../../models/classes/LogGroup'
 import { QueryClient } from '@tanstack/react-query'
+import { Auth0Context, Auth0ContextInterface } from '@auth0/auth0-react'
 
 export default class AddGroupButton extends Component {
+  static contextType = Auth0Context
+  context!: Auth0ContextInterface
+
   render() {
 
-    const mutationFn = () => addLogGroup({
+    const mutationFn = async () => addLogGroup({
       name: 'New Performance Group',
       metric: 'length',
       unit: 'M',
       groupBy: 'none',
       graphType: 'line',
       yStat: 'mean'
-    })
+    }, await this.context.getAccessTokenSilently())
 
     const onSuccess = (json: ILogGroup, queryClient: QueryClient) =>{
       queryClient.setQueryData(['all-log-groups'], (old: Array<LogGroup>) =>{

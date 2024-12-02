@@ -1,5 +1,5 @@
 import randomDateTime from "../../../randomDateTime.js"
-import Util from "../../../Util.ts"
+import { format, formatISO } from "date-fns"
 
 const rdt = (start) =>{ // random datetime iso format
   return randomDateTime(start || new Date(2024, 0, 1), new Date(2024, 10, 9)).toISOString()
@@ -62,7 +62,7 @@ function generateRandomRecords(groupId, n, seedValue, deltaMin, deltaMax, intege
     startDate.setDate(startDate.getDate() + 1)
     records.push({
       value: integer ? Math.round(prev + (Math.random() * (deltaMax-deltaMin) + deltaMin)) : prev + (Math.random() * (deltaMax-deltaMin) + deltaMin),
-      date: Util.toISODate(startDate),
+      date: formatISO(startDate, {representation: 'date'}),
       created: rdt(new Date(group.created)),
       logGroupId: groupId
     })
@@ -71,11 +71,12 @@ function generateRandomRecords(groupId, n, seedValue, deltaMin, deltaMax, intege
 }
 
 export async function seed(knex){
-  await knex('logGroup').del().whereNot({id: 1})
-  await knex.raw("UPDATE sqlite_sequence SET seq = 0 WHERE name = 'logGroup'");
-  await knex.raw("UPDATE sqlite_sequence SET seq = 0 WHERE name = 'logRecord'");
+  await knex('logGroup').del().where('auth0sub', 'auth0|67312bb80d34c425998cb7ec')
+  /*await knex.raw("UPDATE sqlite_sequence SET seq = 0 WHERE name = 'logGroup'");
+  await knex.raw("UPDATE sqlite_sequence SET seq = 0 WHERE name = 'logRecord'");*/
 
   for (const group of groups){
+    group.auth0sub = 'auth0|67312bb80d34c425998cb7ec'
     await knex('logGroup').insert(group)
     const records = RecordBuilders[group.name]()
     if (records.length == 0) continue

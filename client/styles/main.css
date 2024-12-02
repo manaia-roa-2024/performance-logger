@@ -474,9 +474,19 @@ dialog:focus-visible{
 }
 
 .login-button{
+  background: linear-gradient(180deg, var(--header-bg), rgb(144, 248, 131));
+  border: 1px solid rgb(143, 143, 143);
   font-size: 23px;
   padding: 10px 30px;
   cursor: pointer;
+}
+
+.login-button:hover{
+  background: linear-gradient(180deg, #5eb368, var(--header-bg));
+}
+
+.login-button:active{
+  background: linear-gradient(180deg, #4aa054, #5eb368);
 }
 
 .logout-button{

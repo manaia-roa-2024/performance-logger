@@ -3,15 +3,19 @@ import QueryComponent from '../QueryComponent'
 import { VertBox } from '../Box'
 import getLogCollection from '../../apis/getLogCollection'
 import CLogGroup from './CLogGroup'
+import { Auth0Context, Auth0ContextInterface } from '@auth0/auth0-react'
 
 export default class LogGroupPanel extends Component{
+  static contextType = Auth0Context
+  context!: Auth0ContextInterface
+
   constructor(props: object) {
     super(props)
   }
 
   render(): ReactNode {
     return (
-      <QueryComponent queryKey={['all-log-groups']} queryFn={getLogCollection}>
+      <QueryComponent queryKey={['all-log-groups']} queryFn={async () => getLogCollection(await this.context.getAccessTokenSilently())}>
         {
           ({data: logGroups, isPending, isError}) =>{
             

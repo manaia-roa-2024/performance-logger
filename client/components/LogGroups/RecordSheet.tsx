@@ -116,7 +116,7 @@ export default class RecordSheet extends Component<Props, State> {
       <LogGroupContext.Consumer>
         {(context: ILogGroupContext) => {
 
-          const mutationFn = (newRecord: PartialLogRecord) => addLogRecord(newRecord)
+          const mutationFn = async (newRecord: PartialLogRecord) => addLogRecord(newRecord, await context.getAccessTokenSilently())
 
           const onSuccess = (result: ILogRecord) =>{
             context.addNewLogRecord(result)

@@ -39,8 +39,8 @@ class DeleteGroupButton extends Component{
       //popup.close()
     }
 
-    const mutationFn = () =>{
-      return deleteLogGroup(this.context.logGroup.id)
+    const mutationFn = async () =>{
+      return deleteLogGroup(this.context.logGroup.id, await this.context.getAccessTokenSilently())
     }
 
     const onSuccess = () =>{

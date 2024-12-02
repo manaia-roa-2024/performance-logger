@@ -5,8 +5,8 @@ import Util from '../../Util.ts'
 import Optional from '../../models/Optional.ts'
 import ProblemDetails from '../ProblemDetails.ts'
 
-export async function getAllGroups(){
-  const result = await connection<ILogGroup>('logGroup')
+export async function getAllGroups(auth0sub: string){
+  const result = await connection<ILogGroup>('logGroup').where('auth0sub', auth0sub)
   return result
 }
 
@@ -16,30 +16,31 @@ export async function getAllRecords(logGroupId: number){
   return result
 }
 
-export async function addGroup(group: PartialLogGroup){
+export async function addGroup(group: PartialLogGroup, auth0sub: string){
   const result = await connection('logGroup')
     .insert({
       name: group.name,
       metric: group.metric,
       unit: group.unit,
-      created: Util.createTimeStamp()
+      created: Util.createTimeStamp(),
+      auth0sub
     }, '*') as ILogGroup[]
 
   return result[0]
 }
 
-export async function editGroup(group: Optional<PartialLogGroup>, id: number){
+export async function editGroup(group: Optional<PartialLogGroup>, id: number, auth0sub: string){
   const result = await connection('logGroup')
     .update({...group}, '*')
-    .where({id}) as ILogGroup[]
+    .where({id}).andWhere('auth0sub', auth0sub) as ILogGroup[]
   if (result.length === 0)
     throw ProblemDetails.NullError('group')
   return result[0]
 }
 
-export async function deleteGroup(id: number){
+export async function deleteGroup(id: number, auth0sub: string){
   await connection('logGroup')
-    .where({id}).delete()
+    .where({id}).andWhere('auth0sub', auth0sub).delete()
 }
 
 export async function addRecord(record: PartialLogRecord){
@@ -51,4 +52,22 @@ export async function addRecord(record: PartialLogRecord){
       logGroupId: record.logGroupId
     }, '*')
   return result[0]
+}
+
+export async function verifyGroupPermission(id: number, auth0sub: string){
+  const result = await connection('logGroup').where({id}).andWhere('auth0sub', auth0sub)
+
+  console.log(result)
+  if (result.length === 0)
+    throw ProblemDetails.PermissionError()
+}
+
+export async function verifyRecordPermission(id: number, auth0sub: string){
+  const result = await connection('logRecord')
+    .join('logGroup', 'logGroup.id', 'logRecord.logGroupId')
+    .where('logGroup.auth0sub', auth0sub)
+
+  console.log(result)
+  if (result.length === 0)
+    throw ProblemDetails.PermissionError()
 }

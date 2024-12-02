@@ -8,6 +8,7 @@ import { LGProvider } from './LGContext'
 import LGHead from './LGHead'
 import GroupMain from './GroupMain/GroupMain'
 import QueryComponent from '../QueryComponent'
+import { Auth0Context, Auth0ContextInterface } from '@auth0/auth0-react'
 
 interface Props {
   logGroup: LogGroup
@@ -18,6 +19,8 @@ interface State {
 }
 
 export default class CLogGroup extends Component<Props, State> {
+  static contextType = Auth0Context
+  context!: Auth0ContextInterface
   rand: number
 
   constructor(props: Props) {
@@ -40,8 +43,8 @@ export default class CLogGroup extends Component<Props, State> {
   }
 
   render() {
-    const queryFn = () =>{
-      return getLogRecords(this.props.logGroup) 
+    const queryFn = async () =>{
+      return getLogRecords(this.props.logGroup, await this.context.getAccessTokenSilently()) 
     }
 
     return (

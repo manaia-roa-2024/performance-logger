@@ -32,12 +32,12 @@ export default class NameEditor extends Component<Props>{
 
   render(): ReactNode {
 
-    const mutationFn = () => editLogGroup({
-      name: this.getNameInput().getFormattedValue()
-    }, this.props.logGroup.id!)
-
     return <LogGroupContext.Consumer>
       {(context) =>{
+
+        const mutationFn = async () => editLogGroup({
+          name: this.getNameInput().getFormattedValue()
+        }, this.props.logGroup.id!, await context.getAccessTokenSilently())
 
         const onSettled = (result: ILogGroup | undefined) =>{
           if (!result)

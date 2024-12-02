@@ -7,11 +7,12 @@ import BodyValidator from './middleware/BodyValidator.ts'
 import { seed } from './db/seeds/logGroups.js'
 import connection from './db/connection.ts'
 import snapshotRouter from './routes/snapshotRouter.ts'
+import Auth from './middleware/Auth.ts'
 
 const server = express()
 
 server.use(express.json())
-
+server.use('/api/v1/', Auth.checkJwt)
 server.use('/api/v1/', logRouter)
 server.use('/api/v1/snapshots', snapshotRouter)
 
