@@ -10,7 +10,7 @@ export default class Header extends React.Component{
     const buttonClick = () =>{
       this.context.logout({
         logoutParams: {
-          returnTo: window.location.origin + '/login'
+          returnTo: window.location.origin
         }
       })
     }
