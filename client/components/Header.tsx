@@ -5,8 +5,16 @@ import { Auth0Context, Auth0ContextInterface } from "@auth0/auth0-react";
 export default class Header extends React.Component{
   static contextType = Auth0Context
   context!: Auth0ContextInterface
-
   render(){
+
+    const buttonClick = () =>{
+      this.context.logout({
+        logoutParams: {
+          returnTo: window.location.origin + '/login'
+        }
+      })
+    }
+
     return (
       <Box tag='header' className="c-white">
         <div className="sec sec1 fg1 aic">
@@ -17,7 +25,7 @@ export default class Header extends React.Component{
         </Box>
         <Box className="sec sec3 fg1">
           <Box className="sec-inner aic" gap='20px'>
-            <button className="logout-button" onClick={() => this.context.logout()}>Logout</button>
+            <button className="logout-button" onClick={buttonClick}>Logout</button>
             <p>{this.context.user?.email}</p>
           </Box>   
         </Box>
