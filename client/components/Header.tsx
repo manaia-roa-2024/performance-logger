@@ -16,8 +16,9 @@ export default class Header extends React.Component{
           <h1>Performance Logger</h1>
         </Box>
         <Box className="sec sec3 fg1">
-          <Box className="sec-inner aic">
+          <Box className="sec-inner aic" gap='20px'>
             <button className="logout-button" onClick={() => this.context.logout()}>Logout</button>
+            <p>{this.context.user?.email}</p>
           </Box>   
         </Box>
         
